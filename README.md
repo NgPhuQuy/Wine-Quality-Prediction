@@ -1,9 +1,9 @@
 # Wine-Quality-Prediction - Đề tài số 7 - Wine Quality Prediction
 ## Mô tả 
-Bài toán nhận biết chất lượng rượu
-Mục tiêu: Giải quyết bài toán thông qua chỉ số đo được của rượu, từ đó suy ra chất lượng dựa trên thang điểm 10 (0-10)
-Dataset: Nguồn: UCI – Wine Quality (Red + White). 
-Link: https://archive.ics.uci.edu/dataset/186/wine+quality (hoặc Kaggle "Wine Quality")
+- Bài toán nhận biết chất lượng rượu
+- Mục tiêu: Giải quyết bài toán thông qua chỉ số đo được của rượu, từ đó suy ra chất lượng dựa trên thang điểm 10 (0-10)
+- Dataset: Nguồn: UCI – Wine Quality (Red + White). 
+- Link: https://archive.ics.uci.edu/dataset/186/wine+quality (hoặc Kaggle "Wine Quality")
 ## Thành viên nhóm
 
 | MSSV | Họ tên | Vai trò |
