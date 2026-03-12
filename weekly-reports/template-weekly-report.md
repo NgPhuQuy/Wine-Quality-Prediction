@@ -7,9 +7,10 @@
 ## 1. Công việc đã hoàn thành
 | Thành viên | MSSV | Công việc | Link Commit/PR | 
 |------------|------|-----------|----------------| 
-| ...        | ...  | EDA / Preprocessing / Modeling / FE / BE / Báo cáo | 
-... | --- 
-## 2. Tiê ́n độ tô ̉ng thê ̉ 
+|  ...  | ...  | EDA / Preprocessing / Modeling / FE / BE / Báo cáo | ... |
+---
+
+## 2. Tiến độ tổng thể
 | Hạng mục | Trạng thái | % | 
 |----------|------------|---| 
 | EDA | Done / Đang làm / Chưa | ... | 
@@ -20,11 +21,15 @@
 | Backend (API) | ... | ... | 
 | Demo FE ↔ BE ↔ AI | ... | ... | 
 | Báo cáo | ... | ... | 
-**Tô ̉ng tiến độ: ___%** --- 
-## 3. Kê ́ hoạch tuâ ̀n tới 
-| Thành viên | Công việc dự kiê ́n | 
+**Tổng tiến độ: ___%** 
+--- 
+## 3. Kế hoạch tuần tới 
+| Thành viên | Công việc dự kiến | 
 |------------|-------------------| 
-| ...        | ...               | --- 
-## 4. Khó khăn / Câ ̀n hô ̃ trợ- [ ] ... --- 
+| ...        | ...               | 
+--- 
+## 4. Khó khăn / Cần hỗ trợ
+- [ ] ... 
+--- 
 *Ngày nộp: DD/MM/YYYY*   
-*Xác nhận của Nhóm trưởng: [Họ tên]*
+*Xác nhận của Nhóm trưởng: Nguyễn Phú Quý*
