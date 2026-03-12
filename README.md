@@ -34,6 +34,12 @@ jupyter notebook notebooks/project_analysis.ipynb
 cd api && pip install -r requirements.txt && python app.py 
 ### Chạy Frontend 
 cd frontend && npm install && npm start 
-### Truy cập- Frontend: http://localhost:3000 - API: http://localhost:5000 (hoặc port tương ứng) 
-## Demo- wandb: [link] - Screenshot/video: [link hoặc mô tả] 
-## Nộp bài- Báo cáo: report/report.pdf - wandb link: wandb_link.txt
+### Truy cập
+- Frontend: http://localhost:3000
+- API: http://localhost:5000 (hoặc port tương ứng) 
+## Demo
+- wandb: [link]
+- Screenshot/video: [link hoặc mô tả] 
+## Nộp bài
+- Báo cáo: report/report.pdf
+- wandb link: wandb_link.txt
