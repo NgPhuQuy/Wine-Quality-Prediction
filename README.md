@@ -6,15 +6,12 @@ Dataset: Nguồn: UCI – Wine Quality (Red + White).
 Link: https://archive.ics.uci.edu/dataset/186/wine+quality (hoặc Kaggle "Wine Quality")
 ## Thành viên nhóm
 
-|   MSSV   |        Họ tên       |   Vai trò     | 
-
-|2351050147|Nguyễn Phú Quý       |Trưởng nhóm    | 
-
-|2351050001|Đỗ Phước Vũ An       |Thành viên nhóm| 
-
-|2351050028|Phạm Thành Đạt       |Thành viên nhóm|
-
-|2351050099|Nguyễn Hoàng Trúc Mai|Thành viên nhóm|
+| MSSV | Họ tên | Vai trò |
+|------|------|------|
+|2351050147|Nguyễn Phú Quý|Trưởng nhóm|
+|2351050001|Đỗ Phước Vũ An|Thành viên|
+|2351050028|Phạm Thành Đạt|Thành viên|
+|2351050099|Nguyễn Hoàng Trúc Mai|Thành viên|
 
 ## Công nghệ- ML: Python, sklearn, Jupyter - Frontend: ReactJS - Backend: Flask  - Tracking: wandb 
 
