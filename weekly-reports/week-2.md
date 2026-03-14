@@ -16,7 +16,7 @@
 ## 2. Tiến độ tổng thể
 | Hạng mục | Trạng thái | % | 
 |----------|------------|---| 
-| EDA | Done | 100% | 
+| EDA | Done | 10% | 
 | Preprocessing + Pipeline | Chưa | ... | 
 | Modeling (≥3 models, wandb) | Chưa | ... | 
 | Model Persistence | Chưa | ... | 
@@ -29,8 +29,8 @@
 ## 3. Kế hoạch tuần tới 
 | Thành viên | Công việc dự kiến | 
 |------------|-------------------| 
-|Nguyễn Phú Quý|Preprocessing + Pineline| 
-|Đỗ Phước Vũ An|Front-end(Support)|
+|Nguyễn Phú Quý|Backend (API)| 
+|Đỗ Phước Vũ An|Front-end & Preprocessing + Pineline (Support)|
 |Phạm Thành Đạt|Preprocessing + Pineline|
 |Nguyễn Hoàng Trúc Mai|Front-end(full app)|
 
