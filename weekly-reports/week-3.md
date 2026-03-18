@@ -1,4 +1,4 @@
-# Báo cáo tuần 2
+# Báo cáo tuần 3
 **Tuần:** 2 (16/03/2026 - 22/03/2026)   
 **Nhóm:** 9 
 **Đề tài:** 7 - Wine Quality Prediction
@@ -7,10 +7,10 @@
 ## 1. Công việc đã hoàn thành
 | Họ tên | MSSV | Công việc| Link commit/PR|
 |------|------|------|------|
-|Nguyễn Phú Quý|2351050147|Backend (API)||
-|Đỗ Phước Vũ An|2351050001|Front-end & Preprocessing + Pineline (Support)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/tree/276abdb44d5b68ff1b2949fbc85d197d704adac8|
-|Phạm Thành Đạt|2351050028|Preprocessing + Pineline||
-|Nguyễn Hoàng Trúc Mai|2351050099|Front-end(full app)||
+|Nguyễn Phú Quý|2351050147|Backend (API)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/1f48e0f54b175675c982a5a9b6382461708e0093|
+|Đỗ Phước Vũ An|2351050001|Front-end & Preprocessing + Pineline (Support)| Vì lí do suport cho 2 bạn kia nên ko có link commit, bạn hoàn thành tốt|
+|Phạm Thành Đạt|2351050028|Preprocessing + Pineline|https://github.com/NgPhuQuy/Wine-Quality-Prediction/tree/276abdb44d5b68ff1b2949fbc85d197d704adac8|
+|Nguyễn Hoàng Trúc Mai|2351050099|Front-end(full app)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/0f8b4bb0522c41021d9002298343911e5b8676ef|
 ---
 
 ## 2. Tiến độ tổng thể
@@ -20,11 +20,11 @@
 | Preprocessing + Pipeline | Done | ... | 
 | Modeling (≥3 models, wandb) | Chưa | ... | 
 | Model Persistence | Chưa | ... | 
-| Frontend (ReactJS) | Chưa | ... | 
-| Backend (API) | Chưa | ... | 
-| Demo FE ↔ BE ↔ AI | Chưa | ... | 
+| Frontend (ReactJS) | Done | ... | 
+| Backend (API) | Đang làm | ... | 
+| Demo FE ↔ BE ↔ AI | Đang làm | ... | 
 | Báo cáo | Chưa | ... | 
-**Tổng tiến độ: 10%** 
+**Tổng tiến độ: 20%** 
 --- 
 ## 3. Kế hoạch tuần tới 
 | Thành viên | Công việc dự kiến | 
@@ -36,7 +36,7 @@
 
 --- 
 ## 4. Khó khăn / Cần hỗ trợ
-
+hiện tại nhóm đã test thử train model bằng RandomForest, nhưng kết quả trả về chỉ quanh quẩn giá trị trung bình của biến mục tiêu, chưa có sự dự đoán trong mô hình, nhóm em rất cần hỗ trợ và giải thích thêm về phần này
 --- 
 *Ngày nộp: 15/03/2026*
 *Xác nhận của Nhóm trưởng: Nguyễn Phú Quý*
