@@ -1,0 +1,119 @@
+body {
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* CARD */
+.form {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.form:hover {
+  transform: translateY(-5px);
+}
+
+/* TITLE */
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* INPUT */
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.input-group input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76,175,80,0.4);
+}
+
+/* BUTTON */
+.btn {
+  display: block;
+  margin: 25px auto 0;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #4CAF50, #2ecc71);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* RESULT CARD */
+.result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.good {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.bad {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* SPINNER */
+.spinner {
+  border: 5px solid #eee;
+  border-top: 5px solid #4CAF50;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  margin: 20px auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
