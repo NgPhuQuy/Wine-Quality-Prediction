@@ -50,7 +50,7 @@ function WineForm({ setResult, setLoading, setChartData }) {
           </div>
         ))}
       </div>
-      <button type="submit" className="btn-predict">QUALITY PREDICTION</button>
+      <button type="submit" className="btn-predict">QUALITY PREDICT</button>
     </form>
   );
 }
