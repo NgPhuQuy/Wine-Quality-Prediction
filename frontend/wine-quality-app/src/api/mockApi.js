@@ -1,5 +1,5 @@
 export const predictWine = async (data) => {
-  console.log("Data gửi lên:", data)
+  console.log("Data :", data)
 
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -26,7 +26,7 @@ export const getModelInfo = async () => {
       resolve({
         model: "Random Forest",
         accuracy: "87%",
-        description: "Model dự đoán chất lượng rượu vang dựa trên các đặc trưng hóa học"
+        description: "This model predicts wine quality based on chemical characteristics."
       })
     }, 500)
   })
