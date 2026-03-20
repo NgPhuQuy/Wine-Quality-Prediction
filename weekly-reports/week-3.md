@@ -36,7 +36,7 @@
 
 --- 
 ## 4. Khó khăn / Cần hỗ trợ
-hiện tại nhóm đã test thử train model bằng RandomForest, nhưng kết quả trả về chỉ quanh quẩn giá trị trung bình của biến mục tiêu, chưa có sự dự đoán trong mô hình, nhóm em rất cần hỗ trợ và giải thích thêm về phần này
+
 --- 
 *Ngày nộp: 15/03/2026*
 *Xác nhận của Nhóm trưởng: Nguyễn Phú Quý*
