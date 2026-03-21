@@ -42,5 +42,5 @@ def predict_wine(data):
 
     return {
         "quality": 7,
-        "raw_score": 2
+        "raw_score": 1
     }

@@ -1,24 +1,36 @@
-export const predictWine = async (data) => {
-  console.log("Data :", data)
+// export const predictWine = async (data) => {
+//   console.log("Data :", data)
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
+//   return new Promise((resolve) => {
+//     setTimeout(() => {
 
-      const alcohol = parseFloat(data.alcohol)
+//       const alcohol = parseFloat(data.alcohol)
 
-      let prediction = "Bad ❌"
+//       let prediction = "Bad ❌"
 
-      if (alcohol > 10) {
-        prediction = "Good 🍷"
-      }
+//       if (alcohol > 10) {
+//         prediction = "Good 🍷"
+//       }
 
-      resolve({
-        prediction: prediction
-      })
+//       resolve({
+//         prediction: prediction
+//       })
 
-    }, 1000)
-  })
-}
+//     }, 1000)
+//   })
+// }
+export const predictWine = async (formData) => {
+  const res = await fetch("http://127.0.0.1:8000/predict", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
+
+  const data = await res.json();
+  return data;
+};
 
 export const getModelInfo = async () => {
   return new Promise((resolve) => {
