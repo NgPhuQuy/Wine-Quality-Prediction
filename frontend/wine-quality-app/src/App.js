@@ -32,7 +32,7 @@ function App() {
         {loading && <div className="spinner"></div>}
 
         {!loading && result && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: "24px" }}>
+          <div className="result-chart-layout">
             <ResultCard result={result} />
             <div className="chart-card">
               <WineChart data={chartData} />
