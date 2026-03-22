@@ -109,3 +109,252 @@ input:focus {
   animation: spin 1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* ===== SLIDER UI UPGRADE ===== */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #38b2ac, #6366f1);
+  outline: none;
+  transition: 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #6366f1;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+/* Card đẹp hơn */
+.form-card {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(200, 200, 200, 0.2);
+}
+
+/* Button xịn hơn */
+.btn-predict {
+  background: linear-gradient(135deg, #6366f1, #38b2ac);
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
+/* Wine type button */
+.wine-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.wine-btn:hover {
+  transform: translateY(-2px);
+}
+
+.wine-btn.active-red {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+}
+
+.wine-btn.active-white {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: white;
+}
+
+/* ===== RANGE CLEAN PREMIUM ===== */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: transparent; /* ❌ bỏ nền ngoài */
+  border: none; /* ❌ bỏ viền */
+  outline: none;
+  padding: 0;
+}
+
+/* Track (thanh chính) */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 10px;
+  background: transparent; /* để React xử lý gradient */
+}
+
+/* ===== THUMB CLEAN (GRAY DOT) ===== */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #cbd5f5; /* xám nhạt */
+  border: none; /* ❌ bỏ viền */
+  cursor: pointer;
+  margin-top: -5px;
+  transition: all 0.2s ease;
+}
+
+/* hover nhẹ */
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: #e2e8f0; /* sáng hơn */
+}
+
+/* khi kéo */
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.3);
+  background: #f1f5f9; /* nhạt hơn nữa */
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  background: #e2e8f0;
+}
+
+input[type="range"]::-moz-range-thumb:active {
+  transform: scale(1.3);
+  background: #f1f5f9;
+}
+
+/* ===== LUXURY CARD ===== */
+.result-card.luxury {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* Title */
+.result-card .title {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #64748b;
+}
+
+/* Icon */
+.wine-icon {
+  font-size: 30px;
+  margin: 10px 0;
+}
+
+/* ===== GAUGE ===== */
+.gauge {
+  width: 140px;
+  height: 140px;
+  margin: 20px auto;
+  border-radius: 50%;
+}
+
+.gauge-fill {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-inner {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* description */
+.desc {
+  font-size: 13px;
+  color: #475569;
+  margin-top: 10px;
+}
+
+.chart-card {
+  width:100%;
+  min-height: 350px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 25px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* tiêu đề */
+.chart-card h3 {
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+/* layout result + chart */
+.result-chart-layout {
+  display: grid;
+  grid-template-columns: 40% 60%; /* 👈 CHIA NGANG */
+  gap: 24px;
+  width: 100%;
+}
+
+/* responsive cho laptop nhỏ */
+@media (max-width: 900px) {
+  .result-chart-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* chia layout 10 phần */
+.main-content {
+  margin-left: 280px;
+  flex: 1;
+  padding: 40px;
+}
+
+/* form full width */
+.form-card {
+  grid-column: span 2;
+}
+.form-card, .result-card, .chart-card {
+  transition: all 0.25s ease;
+}
+
+
+.form-card:hover,
+.result-card:hover,
+.chart-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Hiệu ứng thẻ kính mờ */
+.analysis-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
