@@ -1,25 +1,3 @@
-// export const predictWine = async (data) => {
-//   console.log("Data :", data)
-//export const predictWine = async (data) => {
-  //console.log("Data :", data)
-
-//   return new Promise((resolve) => {
-//     setTimeout(() => {
-
-//       const alcohol = parseFloat(data.alcohol)
-
-//       let prediction = "Bad ❌"
-
-//       if (alcohol > 10) {
-//         prediction = "Good 🍷"
-//       }
-
-//       resolve({
-//         prediction: prediction
-//       })
-
-// src/api/mockApi.js
-
 export const predictWine = async (formData) => {
   try {
     const res = await fetch("http://127.0.0.1:8000/predict", {
@@ -46,17 +24,9 @@ export const predictWine = async (formData) => {
     throw new Error("Invalid response");
 
   } catch (error) {
-    console.warn("⚠️ API lỗi → dùng mock local");
+    alert("API lỗi");
 
-    // ===== 🤖 FAKE AI (fallback) =====
-    let score = 0;
-
-    score += formData.alcohol * 0.3;
-    score += (1 - Math.abs(formData.pH - 3.3)) * 2;
-    score += formData.sulphates * 1.5;
-    score -= formData.residual_sugar * 0.05;
-
-    let quality = Math.min(9, Math.max(3, Math.round(score)));
+    let quality = 0;
 
     return {
       quality: quality,
@@ -66,7 +36,6 @@ export const predictWine = async (formData) => {
 };
 
 
-// info model (giữ nguyên nhưng đẹp hơn)
 export const getModelInfo = async () => {
   return new Promise((resolve) => {
     setTimeout(() => {
