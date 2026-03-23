@@ -16,27 +16,27 @@
 ## 2. Tiến độ tổng thể
 | Hạng mục | Trạng thái | % | 
 |----------|------------|---| 
-| EDA | Done | 10% | 
-| Preprocessing + Pipeline | Done | ... | 
+| EDA | Done | 100% | 
+| Preprocessing + Pipeline | Done | 100% | 
 | Modeling (≥3 models, wandb) | Chưa | ... | 
 | Model Persistence | Chưa | ... | 
-| Frontend (ReactJS) | Done | ... | 
-| Backend (API) | Đang làm | ... | 
+| Frontend (ReactJS) | Done | 100% | 
+| Backend (API) | Done | 100% | 
 | Demo FE ↔ BE ↔ AI | Đang làm | ... | 
 | Báo cáo | Chưa | ... | 
-**Tổng tiến độ: 20%** 
+**Tổng tiến độ: 50%** 
 --- 
 ## 3. Kế hoạch tuần tới 
 | Thành viên | Công việc dự kiến | 
 |------------|-------------------| 
-|Nguyễn Phú Quý|| 
-|Đỗ Phước Vũ An||
-|Phạm Thành Đạt||
-|Nguyễn Hoàng Trúc Mai||
+|Nguyễn Phú Quý|model (Random Forest)| 
+|Đỗ Phước Vũ An|model (SVM)|
+|Phạm Thành Đạt|model (logistic regression)|
+|Nguyễn Hoàng Trúc Mai|model (XGBoost/LightGBM)|
 
 --- 
 ## 4. Khó khăn / Cần hỗ trợ
 
 --- 
-*Ngày nộp: 15/03/2026*
+*Ngày nộp: 22/03/2026*
 *Xác nhận của Nhóm trưởng: Nguyễn Phú Quý*
