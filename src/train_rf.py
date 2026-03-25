@@ -44,7 +44,7 @@ param_grid = {
 grid_search = GridSearchCV(
     pipeline,
     param_grid,
-    cv=3,
+    cv=5,
     scoring='accuracy'
 )
 
