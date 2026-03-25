@@ -22,3 +22,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+venv/
+.env/
+
+# Model files (nếu không muốn up)
+*.pkl
+
+# VSCode 
+.vscode/
+.idea/
+
+# OS
+.DS_Store
