@@ -14,4 +14,4 @@ class WineInput(BaseModel):
     sulphates: float = Field(..., ge=0, example=0.56, description="Sulphates (g/dm³)")
     alcohol: float = Field(..., ge=0, example=9.4, description="Alcohol (% by volume)")
     type: Literal["red", "white"] = Field(example="red", description="Wine type", default="red")
-    model: str = "xgboost"
+    model: Literal["xgboost", "lightgbm"] = Field(default="xgboost", description="Chọn mô hình dự báo")
