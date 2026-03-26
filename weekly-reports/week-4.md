@@ -7,10 +7,10 @@
 ## 1. Công việc đã hoàn thành
 | Họ tên | MSSV | Công việc| Link commit/PR|
 |------|------|------|------|
-|Nguyễn Phú Quý|2351050147|model (Random Forest)||
-|Đỗ Phước Vũ An|2351050001|model (SVM)||
-|Phạm Thành Đạt|2351050028|model (logistic regression)||
-|Nguyễn Hoàng Trúc Mai|2351050099|model (XGBoost/LightGBM)||
+|Nguyễn Phú Quý|2351050147|model (Random Forest)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/tree/fa0492a1cbe782e8713979424bd0191f4108dca5|
+|Đỗ Phước Vũ An|2351050001|model (SVM)|(trễ)|
+|Phạm Thành Đạt|2351050028|model (logistic regression)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/70eae4e6a34a4465575a76724a68cbc99f03db8b|
+|Nguyễn Hoàng Trúc Mai|2351050099|model (XGBoost/LightGBM)|(trễ)|
 ---
 
 ## 2. Tiến độ tổng thể
