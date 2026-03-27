@@ -12,9 +12,19 @@ from sklearn.metrics import accuracy_score, classification_report, f1_score
 # ======================
 # 1. Load dataset
 # ======================
-df = pd.read_csv("data/winequality_combined.csv")
+df_red = pd.read_csv("data/winequality-red.csv", sep=";")
+df_white = pd.read_csv("data/winequality-white.csv", sep=";")
 
+# Thêm cột type
+df_red["type"] = "red"
+df_white["type"] = "white"
+
+# Gộp lại
+df = pd.concat([df_red, df_white], ignore_index=True)
+
+# Encode type
 df["type"] = df["type"].map({"red": 0, "white": 1})
+
 
 # ======================
 # 2. Feature & target
