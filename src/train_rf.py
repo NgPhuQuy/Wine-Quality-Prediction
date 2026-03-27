@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score
 
-# 1. Load dataset
+# 1. Load datasetp
 df = pd.read_csv("data/winequality_combined.csv")
 
 df["type"] = df["type"].map({
