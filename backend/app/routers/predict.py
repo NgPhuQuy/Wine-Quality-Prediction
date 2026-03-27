@@ -1,16 +1,10 @@
 from fastapi import APIRouter
-from app.schemas.wine import WineInput
-from app.services.model import predict_wine
+from schemas.wine import WineInput
+from services.model import predict_wine
 
-router = APIRouter()
+router = APIRouter(prefix="/predict", tags=["Predict"])
 
-@router.post("/predict")
-def predict(data: WineInput):
-    result = predict_wine(data, model_name=data.model)
-
-    return {
-        "model": data.model,
-        "quality": result["quality"],
-        "time": result["time"]
-    }
+@router.post("/")
+def predict_wine(data: WineInput):
+    return predict_wine(data)
 
