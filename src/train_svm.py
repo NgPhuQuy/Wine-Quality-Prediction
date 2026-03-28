@@ -9,9 +9,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, f1_score
 
-# ======================
-# 1. Load dataset
-# ======================
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
 
@@ -26,16 +23,10 @@ df["total_acidity"] = df["fixed acidity"] + df["volatile acidity"]
 df["sugar_alcohol_ratio"] = df["residual sugar"] / (df["alcohol"] + 1e-5)
 df["density_alcohol_interaction"] = df["density"] * df["alcohol"]
 
-# ======================
-# 2. Feature & target
-# ======================
 X = df.drop("quality", axis=1)
 y = (df["quality"] >= 6).astype(int)
 
 
-# ======================
-# 3. Train/Test split
-# ======================
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
     test_size=0.2,
@@ -43,22 +34,13 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-# ======================
-# 4. WandB init
-# ======================
 wandb.init(project="wine-quality", name="SVM_Optimized")
 
-# ======================
-# 5. Pipeline
-# ======================
 pipeline = Pipeline([
     ('scaler', StandardScaler()),
     ('svm', SVC(probability=True, random_state=42))
 ])
 
-# ======================
-# 🔥 6. CV 5-FOLD (GIỐNG BẠN)
-# ======================
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 cv_scores = cross_val_score(pipeline, X, y, cv=cv)
@@ -75,9 +57,6 @@ wandb.log({
     "cv_std": cv_scores.std()
 }, step=len(cv_scores))
 
-# ======================
-# 🔥 7. GridSearch tuning (TỐI ƯU SVM)
-# ======================
 param_grid = [
     {
         'svm__kernel': ['linear'],
@@ -98,31 +77,22 @@ grid_search = GridSearchCV(
     n_jobs=-1
 )
 
-print("\n🚀 Đang chạy GridSearch SVM...")
+print("\n Đang chạy GridSearch SVM...")
 grid_search.fit(X_train, y_train)
 
-# ======================
-# 8. Best model
-# ======================
 best_model = grid_search.best_estimator_
 
-# ======================
-# 9. Evaluate
-# ======================
 y_pred = best_model.predict(X_test)
 y_probas = best_model.predict_proba(X_test)
 
 test_acc = accuracy_score(y_test, y_pred)
 test_f1 = f1_score(y_test, y_pred)
 
-print(f"\n✅ Best params: {grid_search.best_params_}")
-print(f"🎯 Test Accuracy: {test_acc:.4f}")
-print(f"📊 Test F1: {test_f1:.4f}")
-print("\n📄 Report:\n", classification_report(y_test, y_pred))
+print(f"\n Best params: {grid_search.best_params_}")
+print(f" Test Accuracy: {test_acc:.4f}")
+print(f" Test F1: {test_f1:.4f}")
+print("\n Report:\n", classification_report(y_test, y_pred))
 
-# ======================
-# 10. Log wandb
-# ======================
 wandb.log({
     "best_cv_f1": grid_search.best_score_,
     "test_accuracy": test_acc,
@@ -140,12 +110,9 @@ wandb.log({
     )
 })
 
-# ======================
-# 11. Save model
-# ======================
 os.makedirs("models", exist_ok=True)
 joblib.dump(best_model, "models/svm_best.joblib")
 
 wandb.finish()
 
-print("\n✨ Done! Check WandB dashboard.")
+print("\n Done! Check WandB dashboard.")
