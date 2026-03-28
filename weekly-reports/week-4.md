@@ -8,9 +8,9 @@
 | Họ tên | MSSV | Công việc| Link commit/PR|
 |------|------|------|------|
 |Nguyễn Phú Quý|2351050147|model (Random Forest)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/tree/fa0492a1cbe782e8713979424bd0191f4108dca5|
-|Đỗ Phước Vũ An|2351050001|model (SVM)|(trễ)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/tree/ddd0810edaae1f4f7798a09f4ac1cc3400dfa541|
+|Đỗ Phước Vũ An|2351050001|model (SVM)|(trễ) https://github.com/NgPhuQuy/Wine-Quality-Prediction/tree/ddd0810edaae1f4f7798a09f4ac1cc3400dfa541|
 |Phạm Thành Đạt|2351050028|model (logistic regression)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/70eae4e6a34a4465575a76724a68cbc99f03db8b|
-|Nguyễn Hoàng Trúc Mai|2351050099|model (XGBoost/LightGBM)|(trễ)|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/c3e2cfdb36f577a4a7aef31e34e69138d28fa84a|
+|Nguyễn Hoàng Trúc Mai|2351050099|model (XGBoost/LightGBM)|(trễ) https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/c3e2cfdb36f577a4a7aef31e34e69138d28fa84a|
 ---
 
 ## 2. Tiến độ tổng thể
