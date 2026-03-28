@@ -9,9 +9,6 @@ from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, f1_score
 
-# ======================
-# 1. Load dataset
-# ======================
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
 
@@ -21,9 +18,7 @@ df_white["type"] = "white"
 df = pd.concat([df_red, df_white], ignore_index=True)
 df["type"] = df["type"].map({"red": 0, "white": 1})
 
-# ======================
-# 🔥 2. Feature Engineering (FULL)
-# ======================
+
 
 df["total_acidity"] = df["fixed acidity"] + df["volatile acidity"]
 df["sugar_alcohol_ratio"] = df["residual sugar"] / (df["alcohol"] + 1e-5)
@@ -31,15 +26,10 @@ df["density_alcohol_interaction"] = df["density"] * df["alcohol"]
 
 
 
-# ======================
-# 3. Feature & target
-# ======================
+
 X = df.drop("quality", axis=1)
 y = (df["quality"] >= 6).astype(int)
 
-# ======================
-# 4. Train/Test split
-# ======================
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
     test_size=0.2,
@@ -47,27 +37,21 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-# ======================
-# 5. WandB init
-# ======================
+
 wandb.init(project="wine-quality", name="LogReg_BOOSTED")
 
-# ======================
-# 🔥 6. Pipeline (UPGRADE MẠNH)
-# ======================
+
 pipeline = Pipeline([
     ('scaler', StandardScaler()),
-    ('poly', PolynomialFeatures(degree=2, include_bias=False)),  # 🔥 nonlinear
+    ('poly', PolynomialFeatures(degree=2, include_bias=False)),  
     ('lr', LogisticRegression(
         max_iter=5000,
-        class_weight='balanced',   # 🔥 fix imbalance
+        class_weight='balanced',   
         random_state=42
     ))
 ])
 
-# ======================
-# 7. CV
-# ======================
+
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 cv_scores = cross_val_score(pipeline, X, y, cv=cv)
@@ -81,9 +65,7 @@ wandb.log({
     "cv_std": cv_scores.std()
 })
 
-# ======================
-# 🔥 8. GridSearch
-# ======================
+
 param_grid = {
     'lr__C': [0.01, 0.1, 1, 10, 50],
     'lr__solver': ['liblinear', 'lbfgs']
@@ -97,17 +79,12 @@ grid_search = GridSearchCV(
     n_jobs=-1
 )
 
-print("\n🚀 Đang chạy GridSearch...")
+print("\n Đang chạy GridSearch...")
 grid_search.fit(X_train, y_train)
 
-# ======================
-# 9. Best model
-# ======================
 best_model = grid_search.best_estimator_
 
-# ======================
-# 🔥 10. Threshold tuning
-# ======================
+
 y_probas = best_model.predict_proba(X_test)[:, 1]
 
 best_thresh = 0.5
@@ -121,24 +98,20 @@ for t in [0.4, 0.5, 0.6]:
         best_f1 = f1
         best_thresh = t
 
-print(f"\n🔥 Best threshold: {best_thresh}")
+print(f"\n Best threshold: {best_thresh}")
 
 y_pred = (y_probas > best_thresh).astype(int)
 
-# ======================
-# 11. Evaluate
-# ======================
+
 test_acc = accuracy_score(y_test, y_pred)
 test_f1 = f1_score(y_test, y_pred)
 
-print(f"\n✅ Best params: {grid_search.best_params_}")
-print(f"🎯 Test Accuracy: {test_acc:.4f}")
-print(f"📊 Test F1: {test_f1:.4f}")
-print("\n📄 Report:\n", classification_report(y_test, y_pred))
+print(f"\n Best params: {grid_search.best_params_}")
+print(f" Test Accuracy: {test_acc:.4f}")
+print(f" Test F1: {test_f1:.4f}")
+print("\n Report:\n", classification_report(y_test, y_pred))
 
-# ======================
-# 12. Log wandb
-# ======================
+
 wandb.log({
     "best_cv_f1": grid_search.best_score_,
     "test_accuracy": test_acc,
@@ -156,12 +129,10 @@ wandb.log({
     )
 })
 
-# ======================
-# 13. Save model
-# ======================
+
 os.makedirs("models", exist_ok=True)
 joblib.dump(best_model, "models/logistic_best_boosted.joblib")
 
 wandb.finish()
 
-print("\n✨ DONE! Logistic Regression improved.")
+print("\n DONE! Logistic Regression improved.")
