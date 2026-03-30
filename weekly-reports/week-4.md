@@ -29,10 +29,10 @@
 ## 3. Kế hoạch tuần tới 
 | Thành viên | Công việc dự kiến | 
 |------------|-------------------| 
-|Nguyễn Phú Quý|| 
-|Đỗ Phước Vũ An||
-|Phạm Thành Đạt||
-|Nguyễn Hoàng Trúc Mai||
+|Nguyễn Phú Quý|Thiết kế evaluation pipeline chung| 
+|Đỗ Phước Vũ An|Learning Curve, overfitting / underfitting|
+|Phạm Thành Đạt|Accuracy Precision, Recall, F1-score|
+|Nguyễn Hoàng Trúc Mai|Confusion Matrix, ROC Curve và AUC|
 
 --- 
 ## 4. Khó khăn / Cần hỗ trợ
