@@ -1,20 +1,14 @@
-# metrics.py
-
 from sklearn.metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    classification_report,
-    mean_squared_error,
-    mean_absolute_error,
-    r2_score
+    accuracy_score, 
+    precision_score, 
+    recall_score, 
+    f1_score, 
+    classification_report, 
+    log_loss  # Thêm cái này để tính Log Loss
 )
 
-# =========================
-# Classification
-# =========================
-def evaluate_classification(y_test, y_pred, model_name="Model"):
+# Thêm tham số y_proba=None vào định nghĩa hàm
+def evaluate_classification(y_test, y_pred, y_proba=None, model_name="Model"):
     print(f"\n===== {model_name} (Classification) =====")
 
     acc = accuracy_score(y_test, y_pred)
@@ -22,43 +16,23 @@ def evaluate_classification(y_test, y_pred, model_name="Model"):
     recall = recall_score(y_test, y_pred, average='weighted')
     f1 = f1_score(y_test, y_pred, average='weighted')
 
-    print("Accuracy:", acc)
-    print("Precision:", precision)
-    print("Recall:", recall)
-    print("F1-score:", f1)
+    print(f"Accuracy:  {acc:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall:    {recall:.4f}")
+    print(f"F1-score:  {f1:.4f}")
+
+    # Kiểm tra nếu người dùng có truyền y_proba thì mới tính Log Loss
+    if y_proba is not None:
+        loss = log_loss(y_test, y_proba)
+        print(f"Log Loss:  {loss:.4f}")
 
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred))
 
-    # Nhận xét (viết giống sinh viên)
     print("\nNhận xét:")
-    if acc > 0.85:
-        print("- Model rất tốt, dự đoán chính xác cao.")
-    elif acc > 0.75:
-        print("- Model khá ổn, có thể cải thiện thêm.")
+    if f1 > 0.85:
+        print("- Model rất tốt, khả năng phân loại rượu ngon/thường rất chính xác.")
+    elif f1 > 0.75:
+        print("- Model khá ổn, nhưng có thể cải thiện bằng cách tuning hoặc xử lý dữ liệu.")
     else:
-        print("- Model chưa tốt, cần tuning thêm.")
-
-# =========================
-# Regression
-# =========================
-def evaluate_regression(y_test, y_pred, model_name="Model"):
-    print(f"\n===== {model_name} (Regression) =====")
-
-    mse = mean_squared_error(y_test, y_pred)
-    rmse = mse ** 0.5
-    mae = mean_absolute_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
-
-    print("MSE:", mse)
-    print("RMSE:", rmse)
-    print("MAE:", mae)
-    print("R2:", r2)
-
-    print("\nNhận xét:")
-    if r2 > 0.8:
-        print("- Model hồi quy rất tốt.")
-    elif r2 > 0.6:
-        print("- Model khá ổn.")
-    else:
-        print("- Model còn sai số cao.")
+        print("- Model chưa tốt, cần kiểm tra lại feature engineering hoặc bù mẫu (SMOTE).")
