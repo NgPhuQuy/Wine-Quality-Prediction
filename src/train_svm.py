@@ -86,12 +86,12 @@ wandb.log({
 param_grid = [
     {
         'svm__kernel': ['linear'],
-        'svm__C': [0.1, 1, 10]
+        'svm__C': [0.01, 0.1, 1] # Thêm 0.01 để giảm Overfitting
     },
     {
         'svm__kernel': ['rbf'],
-        'svm__C': [1, 10],
-        'svm__gamma': ['scale', 0.1]
+        'svm__C': [0.1, 1, 10], 
+        'svm__gamma': ['scale', 'auto', 0.01, 0.05] # auto và giá trị nhỏ giúp đường biên mượt hơn
     }
 ]
 
@@ -116,7 +116,7 @@ y_probas = best_model.predict_proba(X_test)[:, 1]
 best_thresh = 0.5
 best_f1 = 0
 
-for t in [0.4, 0.5, 0.6]:
+for t in np.linspace(0.3, 0.7, 9):
     preds = (y_probas > t).astype(int)
     f1 = f1_score(y_test, preds)
 

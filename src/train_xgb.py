@@ -5,9 +5,10 @@ import wandb
 import numpy as np
 import warnings
 
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold, cross_val_score
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
-from xgboost import XGBClassifier
+from xgboost import XGBClassifier, plot_importance
 from metrics import evaluate_classification
 from Learning_Curve import plot_learning_curve
 
@@ -56,11 +57,13 @@ wandb.init(project="wine-quality", name="XGB_FINAL_V2")
 # ======================
 # 5. MODEL + CV
 # ======================
+# Sửa lại mục 5. MODEL
 model = XGBClassifier(
     eval_metric="logloss",
     random_state=42,
     n_jobs=-1,
-    tree_method="hist"   # 🔥 tăng tốc
+    tree_method="hist",
+    scale_pos_weight=(len(y_train) - sum(y_train)) / sum(y_train)
 )
 
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -80,9 +83,12 @@ wandb.log({
 # 6. GRID SEARCH
 # ======================
 param_grid = {
-    "n_estimators": [100, 200],
-    "max_depth": [4, 5],
-    "learning_rate": [0.05, 0.1],
+    "n_estimators": [500, 1000], 
+    "learning_rate": [0.01, 0.05], 
+    "max_depth": [2, 3, 4],
+    "gamma": [0.5, 1, 2],
+    "reg_alpha": [0, 0.1],
+    "reg_lambda": [10, 50, 100],
     "subsample": [0.8],
     "colsample_bytree": [0.8]
 }
