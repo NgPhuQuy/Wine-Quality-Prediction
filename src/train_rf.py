@@ -109,9 +109,9 @@ wandb.log({
     "best_params": str(grid_search.best_params_)
 })
 
-# 9. Save Model & Data cho các thành viên khác
+# 9. Save Model
 os.makedirs("models", exist_ok=True)
-joblib.dump(best_model, "models/random_forest_classification.joblib")
+joblib.dump(best_model, "models/rf_model.joblib")
 plot_learning_curve(best_model, "RandomForest", X_train, y_train, kf)
 wandb.finish()
 print("\n--- HOÀN THÀNH PIPELINE ---")
