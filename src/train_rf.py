@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, classification_report
-
+from Learning_Curve import plot_learning_curve
 # 1. Load Data
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
@@ -120,6 +120,6 @@ wandb.log({
 # 9. Save Model
 os.makedirs("models", exist_ok=True)
 joblib.dump(best_model, "models/random_forest_classification.joblib")
-
+plot_learning_curve(best_model, "RandomForest", X_train, y_train, kf)
 wandb.finish()
 print("\nDONE RF CLASSIFICATION PIPELINE!")

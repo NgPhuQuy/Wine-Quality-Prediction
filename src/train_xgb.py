@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV,  StratifiedK
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from xgboost import XGBClassifier
 from metrics import evaluate_classification
+from Learning_Curve import plot_learning_curve
 # ======================
 # 0. INIT WANDB
 # ======================
@@ -135,5 +136,5 @@ joblib.dump(best_model, model_path)
 wandb.save(model_path)
 
 print("\n✅ Saved:", model_path)
-
+plot_learning_curve(best_model, "XGBoost", X_train, y_train, cv)
 wandb.finish()
