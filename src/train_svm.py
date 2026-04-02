@@ -8,6 +8,7 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, f1_score
+from metrics import evaluate_classification
 
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
@@ -89,9 +90,9 @@ test_acc = accuracy_score(y_test, y_pred)
 test_f1 = f1_score(y_test, y_pred)
 
 print(f"\n Best params: {grid_search.best_params_}")
-print(f" Test Accuracy: {test_acc:.4f}")
-print(f" Test F1: {test_f1:.4f}")
-print("\n Report:\n", classification_report(y_test, y_pred))
+print(f"\n Best params: {grid_search.best_params_}")
+
+evaluate_classification(y_test, y_pred, "SVM")
 
 wandb.log({
     "best_cv_f1": grid_search.best_score_,
