@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-
+from metrics import evaluate_regression
 
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
@@ -100,9 +100,8 @@ mae = mean_absolute_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
 
 print(f"\n Best params: {grid_search.best_params_}")
-print(f" Test RMSE: {rmse:.4f}")
-print(f" Test MAE: {mae:.4f}")
-print(f" R2 Score: {r2:.4f}")
+
+evaluate_regression(y_test, y_pred, "Random Forest Regression")
 
 feat_importance = pd.Series(
     best_model.named_steps['rf'].feature_importances_,
