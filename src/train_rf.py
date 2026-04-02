@@ -62,11 +62,15 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X_train, y_train), 1):
     print(f"Fold {fold}: F1-Score = {f1_val:.4f}")
     wandb.log({"cv_fold_f1": f1_val})
 
-# 6. Grid Search (Tối ưu hyperparameter)
+# 6. Grid Search
 param_grid = {
-    'rf__n_estimators': [100, 200],
-    'rf__max_depth': [None, 10, 20],
-    'rf__min_samples_split': [2, 5]
+    'rf__n_estimators': [200, 300], 
+    'rf__max_depth': [8, 10, 12],        # Giảm độ sâu xuống (đừng để 20 nếu vẫn overfit)
+    'rf__min_samples_split': [20, 40],   # Tăng mạnh để ngăn chia nhỏ
+    'rf__min_samples_leaf': [15, 25, 40],# Tăng mạnh số mẫu ở lá để làm mượt model
+    'rf__max_features': [0.5, 'sqrt'],   # Thử dùng chỉ 50% số feature cho mỗi cây
+    'rf__bootstrap': [True],
+    'rf__max_samples': [0.7, 0.8]        # Mỗi cây chỉ học trên 70-80% dữ liệu gốc (Bagging)
 }
 
 grid_search = GridSearchCV(
