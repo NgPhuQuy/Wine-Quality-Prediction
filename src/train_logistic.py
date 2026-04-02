@@ -107,7 +107,7 @@ test_acc = accuracy_score(y_test, y_pred)
 test_f1 = f1_score(y_test, y_pred)
 print(f"\n Best params: {grid_search.best_params_}")
 
-evaluate_classification(y_test, y_pred, "Logistic Regression")
+# evaluate_classification(y_test, y_pred, y_proba=y_proba, model_name="Logistic Regression")
 plot_learning_curve(best_model, "Logistic", X_train, y_train, cv) 
 
 wandb.log({
