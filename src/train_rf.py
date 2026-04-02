@@ -7,6 +7,7 @@ from metrics import evaluate_classification
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
+from Learning_Curve import plot_learning_curve
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 # 1. Load Data
@@ -110,9 +111,7 @@ wandb.log({
 
 # 9. Save Model & Data cho các thành viên khác
 os.makedirs("models", exist_ok=True)
-joblib.dump(best_model, "models/rf_model.joblib")
-# Lưu lại X_test, y_test để Mai và An dùng vẽ ROC, Learning Curve mà không phải chạy lại pipeline
-joblib.dump((X_test, y_test), "models/test_data.joblib")
-
+joblib.dump(best_model, "models/random_forest_classification.joblib")
+plot_learning_curve(best_model, "RandomForest", X_train, y_train, kf)
 wandb.finish()
 print("\n--- HOÀN THÀNH PIPELINE ---")

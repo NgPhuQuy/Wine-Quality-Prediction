@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, f1_score
 from metrics import evaluate_classification
-
+from Learning_Curve import plot_learning_curve
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
 
@@ -113,7 +113,7 @@ wandb.log({
 
 os.makedirs("models", exist_ok=True)
 joblib.dump(best_model, "models/svm_best.joblib")
-
+plot_learning_curve(best_model, "SVM", X_train, y_train, cv)
 wandb.finish()
 
 print("\n Done! Check WandB dashboard.")
