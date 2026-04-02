@@ -8,12 +8,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, f1_score
+from Learning_Curve import plot_learning_curve
 
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
 
 df_red["type"] = "red"
 df_white["type"] = "white"
+
 
 df = pd.concat([df_red, df_white], ignore_index=True)
 df["type"] = df["type"].map({"red": 0, "white": 1})
@@ -53,8 +55,7 @@ pipeline = Pipeline([
 
 
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
-cv_scores = cross_val_score(pipeline, X, y, cv=cv)
+cv_scores = cross_val_score(pipeline, X_train, y_train, cv=cv)
 
 for i, score in enumerate(cv_scores):
     print(f"Fold {i+1}: {score:.6f}")
@@ -107,7 +108,7 @@ test_f1 = f1_score(y_test, y_pred)
 print(f"\n Best params: {grid_search.best_params_}")
 
 evaluate_classification(y_test, y_pred, "Logistic Regression")
-
+plot_learning_curve(best_model, "Logistic", X_train, y_train, cv) 
 
 wandb.log({
     "best_cv_f1": grid_search.best_score_,
@@ -129,6 +130,9 @@ wandb.log({
 
 os.makedirs("models", exist_ok=True)
 joblib.dump(best_model, "models/logistic_best_boosted.joblib")
+
+
+
 
 wandb.finish()
 

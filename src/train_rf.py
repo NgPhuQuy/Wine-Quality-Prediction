@@ -7,6 +7,7 @@ from metrics import evaluate_classification
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
+from Learning_Curve import plot_learning_curve
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 # 1. Load Data
@@ -111,6 +112,6 @@ wandb.log({
 # 9. Save Model
 os.makedirs("models", exist_ok=True)
 joblib.dump(best_model, "models/rf_model.joblib")
-
+plot_learning_curve(best_model, "RandomForest", X_train, y_train, kf)
 wandb.finish()
 print("\n--- HOÀN THÀNH PIPELINE ---")
