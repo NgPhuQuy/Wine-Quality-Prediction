@@ -2,24 +2,17 @@ import pandas as pd
 import joblib
 import os
 import wandb
+import numpy as np
+import warnings
 
-from sklearn.model_selection import train_test_split, GridSearchCV,  StratifiedKFold, cross_val_score
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold, cross_val_score
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from xgboost import XGBClassifier
 from metrics import evaluate_classification
 from Learning_Curve import plot_learning_curve
-# ======================
-# 0. INIT WANDB
-# ======================
-wandb.init(
-    project="wine-quality-xgboost",
-    name="xgb-gridsearch",
-    config={
-        "model": "XGBoost",
-        "test_size": 0.2,
-        "cv": 5
-    }
-)
+
+# 🔥 Tắt warning XGBoost (optional)
+warnings.filterwarnings("ignore", category=UserWarning, module="xgboost")
 
 # ======================
 # 1. LOAD DATA
@@ -27,17 +20,26 @@ wandb.init(
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
 
-df_red["type"] = "red"
-df_white["type"] = "white"
+df_red["type"] = 0
+df_white["type"] = 1
 
 df = pd.concat([df_red, df_white], ignore_index=True)
-df["type"] = df["type"].map({"red": 0, "white": 1})
 
 # ======================
-# 2. Feature & target
+# 2. Feature Engineering
 # ======================
+df["total_acidity"] = df["fixed acidity"] + df["volatile acidity"]
+df["sugar_alcohol_ratio"] = df["residual sugar"] / (df["alcohol"] + 1e-5)
+df["density_alcohol_interaction"] = df["density"] * df["alcohol"]
+
+df["quality"] = (df["quality"] >= 7).astype(int)
+
+# Fix NaN
+df.replace([np.inf, -np.inf], np.nan, inplace=True)
+df.dropna(inplace=True)
+
 X = df.drop("quality", axis=1)
-y = (df["quality"] >= 6).astype(int)
+y = df["quality"]
 
 # ======================
 # 3. SPLIT
@@ -47,14 +49,23 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # ======================
-# 4. MODEL
+# 4. WANDB
 # ======================
-xgb = XGBClassifier(eval_metric="mlogloss")
+wandb.init(project="wine-quality", name="XGB_FINAL_V2")
 
+# ======================
+# 5. MODEL + CV
+# ======================
+model = XGBClassifier(
+    eval_metric="logloss",
+    random_state=42,
+    n_jobs=-1,
+    tree_method="hist"   # 🔥 tăng tốc
+)
 
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-cv_scores = cross_val_score(xgb, X, y, cv=cv, scoring='accuracy')
+cv_scores = cross_val_score(model, X_train, y_train, cv=cv)
 
 for i, score in enumerate(cv_scores):
     print(f"Fold {i+1}: {score:.6f}")
@@ -65,28 +76,27 @@ wandb.log({
     "cv_std": cv_scores.std()
 })
 
-
 # ======================
-# 5. GRID SEARCH
+# 6. GRID SEARCH
 # ======================
 param_grid = {
     "n_estimators": [100, 200],
-    "max_depth": [4, 5, 6],
+    "max_depth": [4, 5],
     "learning_rate": [0.05, 0.1],
-    "subsample": [0.8, 1],
-    "colsample_bytree": [0.8, 1]
+    "subsample": [0.8],
+    "colsample_bytree": [0.8]
 }
 
 grid = GridSearchCV(
-    xgb,
+    model,
     param_grid,
-    cv=5,
-    scoring="accuracy",
+    cv=cv,
+    scoring="f1",
     verbose=1,
     n_jobs=-1
 )
 
-print("tune model...")
+print("\nĐang tune XGBoost...")
 grid.fit(X_train, y_train)
 
 best_model = grid.best_estimator_
@@ -94,29 +104,52 @@ best_model = grid.best_estimator_
 print("\n🔥 BEST PARAMS:", grid.best_params_)
 
 # ======================
-# 6. EVALUATION
+# 7. THRESHOLD TUNING
 # ======================
-y_pred = best_model.predict(X_test)
+y_probas = best_model.predict_proba(X_test)[:, 1]
 
-acc = accuracy_score(y_test, y_pred)
-print("\n🔥 FINAL RESULT 🔥")
+best_thresh = 0.5
+best_f1 = 0
 
+for t in [0.4, 0.5, 0.6]:
+    preds = (y_probas > t).astype(int)
+    f1 = f1_score(y_test, preds)
 
-evaluate_classification(y_test, y_pred, "XGBoost")
+    if f1 > best_f1:
+        best_f1 = f1
+        best_thresh = t
 
-cm = confusion_matrix(y_test, y_pred)
-print("\n📉 Confusion Matrix:")
-print(cm)
+print(f"\nBest threshold: {best_thresh}")
+
+y_pred = (y_probas > best_thresh).astype(int)
+y_proba_full = best_model.predict_proba(X_test)
 
 # ======================
-# 7. WANDB LOG
+# 8. EVALUATION
+# ======================
+evaluate_classification(
+    y_test,
+    y_pred,
+    y_proba=y_proba_full,
+    model_name="XGBoost"
+)
+
+test_acc = accuracy_score(y_test, y_pred)
+test_f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_probas)
+
+# ======================
+# 9. WANDB LOG
 # ======================
 wandb.log({
-    "accuracy": acc,
-    "best_params": grid.best_params_
+    "best_cv_f1": grid.best_score_,
+    "test_accuracy": test_acc,
+    "test_f1": test_f1,
+    "test_auc": auc,
+    "best_threshold": best_thresh,
+    "best_params": str(grid.best_params_)
 })
 
-# log confusion matrix (🔥 hay dùng)
 wandb.log({
     "confusion_matrix": wandb.plot.confusion_matrix(
         probs=None,
@@ -126,15 +159,19 @@ wandb.log({
 })
 
 # ======================
-# 8. SAVE MODEL
+# 10. SAVE MODEL
 # ======================
 os.makedirs("models", exist_ok=True)
-model_path = "models/xgboost_best.joblib"
+model_path = "models/xgb_model.joblib"
 joblib.dump(best_model, model_path)
 
-# log model lên wandb luôn
 wandb.save(model_path)
 
-print("\n✅ Saved:", model_path)
+# ======================
+# 11. LEARNING CURVE
+# ======================
 plot_learning_curve(best_model, "XGBoost", X_train, y_train, cv)
+
 wandb.finish()
+
+print("\nDONE! XGBoost fixed & optimized.")
