@@ -2,7 +2,7 @@ import pandas as pd
 import wandb
 import joblib
 import os
-
+from metrics import evaluate_classification
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold, cross_val_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler, PolynomialFeatures
@@ -102,14 +102,11 @@ print(f"\n Best threshold: {best_thresh}")
 
 y_pred = (y_probas > best_thresh).astype(int)
 
-
 test_acc = accuracy_score(y_test, y_pred)
 test_f1 = f1_score(y_test, y_pred)
-
 print(f"\n Best params: {grid_search.best_params_}")
-print(f" Test Accuracy: {test_acc:.4f}")
-print(f" Test F1: {test_f1:.4f}")
-print("\n Report:\n", classification_report(y_test, y_pred))
+
+evaluate_classification(y_test, y_pred, "Logistic Regression")
 
 
 wandb.log({

@@ -3,10 +3,10 @@ import joblib
 import os
 import wandb
 
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, GridSearchCV,  StratifiedKFold, cross_val_score
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from xgboost import XGBClassifier
-
+from metrics import evaluate_classification
 # ======================
 # 0. INIT WANDB
 # ======================
@@ -50,6 +50,21 @@ X_train, X_test, y_train, y_test = train_test_split(
 # ======================
 xgb = XGBClassifier(eval_metric="mlogloss")
 
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+cv_scores = cross_val_score(xgb, X, y, cv=cv, scoring='accuracy')
+
+for i, score in enumerate(cv_scores):
+    print(f"Fold {i+1}: {score:.6f}")
+    wandb.log({"cv_accuracy": score}, step=i)
+
+wandb.log({
+    "cv_mean_accuracy": cv_scores.mean(),
+    "cv_std": cv_scores.std()
+})
+
+
 # ======================
 # 5. GRID SEARCH
 # ======================
@@ -84,10 +99,9 @@ y_pred = best_model.predict(X_test)
 
 acc = accuracy_score(y_test, y_pred)
 print("\n🔥 FINAL RESULT 🔥")
-print("Accuracy:", acc)
 
-print("\n📊 Classification Report:")
-print(classification_report(y_test, y_pred))
+
+evaluate_classification(y_test, y_pred, "XGBoost")
 
 cm = confusion_matrix(y_test, y_pred)
 print("\n📉 Confusion Matrix:")
@@ -105,7 +119,7 @@ wandb.log({
 wandb.log({
     "confusion_matrix": wandb.plot.confusion_matrix(
         probs=None,
-        y_true=y_test,
+        y_true=y_test.values,
         preds=y_pred
     )
 })

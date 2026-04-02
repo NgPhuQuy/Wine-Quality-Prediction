@@ -6,8 +6,8 @@ import os
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, classification_report
-
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from metrics import evaluate_regression
 
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
@@ -100,13 +100,9 @@ f1 = f1_score(y_test, y_pred)
 auc = roc_auc_score(y_test, y_prob)
 
 print(f"\n Best params: {grid_search.best_params_}")
-print(f" Test Accuracy:  {accuracy:.4f}")
-print(f" Test Precision: {precision:.4f}")
-print(f" Test Recall:    {recall:.4f}")
-print(f" Test F1-Score:  {f1:.4f}")
-print(f" Test ROC-AUC:   {auc:.4f}")
-
-print("\n Classification Report:\n", classification_report(y_test, y_pred))
+print(f" Test RMSE: {rmse:.4f}")
+print(f" Test MAE: {mae:.4f}")
+print(f" R2 Score: {r2:.4f}")
 
 feat_importance = pd.Series(
     best_model.named_steps['rf'].feature_importances_,
