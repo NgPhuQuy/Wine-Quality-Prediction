@@ -4,7 +4,7 @@ import joblib
 import os
 
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from metrics import evaluate_regression
@@ -18,34 +18,30 @@ df_white["type"] = "white"
 df = pd.concat([df_red, df_white], ignore_index=True)
 df["type"] = df["type"].map({"red": 0, "white": 1})
 
-
 df["total_acidity"] = df["fixed acidity"] + df["volatile acidity"]
 df["sugar_alcohol_ratio"] = df["residual sugar"] / (df["alcohol"] + 1e-5)
 df["density_alcohol_interaction"] = df["density"] * df["alcohol"]
 
+df["quality"] = (df["quality"] >= 7).astype(int)
 
 X = df.drop("quality", axis=1)
 y = df["quality"]
 
-
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
     test_size=0.2,
+    stratify=y,
     random_state=42
 )
 
-
-wandb.init(project="wine-quality", name="RF_REGRESSION_FINAL")
-
+wandb.init(project="wine-quality", name="RF_CLASSIF_FINAL")
 
 pipeline = Pipeline([
-    ('rf', RandomForestRegressor(random_state=42))
+    ('rf', RandomForestClassifier(random_state=42))
 ])
 
-
 kf = KFold(n_splits=5, shuffle=True, random_state=42)
-
-rmse_list = []
+f1_list = []
 
 for fold, (train_idx, val_idx) in enumerate(kf.split(X_train), 1):
     X_tr = X_train.iloc[train_idx]
@@ -56,21 +52,21 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(X_train), 1):
     pipeline.fit(X_tr, y_tr)
     y_pred = pipeline.predict(X_val)
 
-    rmse = mean_squared_error(y_val, y_pred) ** 0.5
-    rmse_list.append(rmse)
+    f1 = f1_score(y_val, y_pred)
+    f1_list.append(f1)
 
-    print(f"Fold {fold}: RMSE = {rmse:.6f}")
-    wandb.log({"cv_rmse": rmse}, step=fold)
+    print(f"Fold {fold}: F1-Score = {f1:.6f}")
+    wandb.log({"cv_f1_score": f1}, step=fold)
 
-mean_rmse = sum(rmse_list) / len(rmse_list)
-std_rmse = pd.Series(rmse_list).std()
+mean_f1 = sum(f1_list) / len(f1_list)
+std_f1 = pd.Series(f1_list).std()
 
-print(f"\n Mean RMSE: {mean_rmse:.6f}")
-print(f" Std RMSE: {std_rmse:.6f}")
+print(f"\n Mean F1: {mean_f1:.6f}")
+print(f" Std F1: {std_f1:.6f}")
 
 wandb.log({
-    "cv_mean_rmse": mean_rmse,
-    "cv_std": std_rmse
+    "cv_mean_f1": mean_f1,
+    "cv_std_f1": std_f1
 })
 
 param_grid = {
@@ -85,23 +81,28 @@ grid_search = GridSearchCV(
     pipeline,
     param_grid,
     cv=kf,
-    scoring='neg_root_mean_squared_error',
+    scoring='f1',
     n_jobs=-1
 )
 
-print("\n Đang chạy GridSearch RF...")
+print("\n Đang chạy GridSearch RF Classification...")
 grid_search.fit(X_train, y_train)
 
 best_model = grid_search.best_estimator_
-y_pred = best_model.predict(X_test)
 
-rmse = mean_squared_error(y_test, y_pred) ** 0.5
-mae = mean_absolute_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
+y_pred = best_model.predict(X_test)
+y_prob = best_model.predict_proba(X_test)[:, 1] 
+
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+auc = roc_auc_score(y_test, y_prob)
 
 print(f"\n Best params: {grid_search.best_params_}")
-
-evaluate_regression(y_test, y_pred, "Random Forest Regression")
+print(f" Test RMSE: {rmse:.4f}")
+print(f" Test MAE: {mae:.4f}")
+print(f" R2 Score: {r2:.4f}")
 
 feat_importance = pd.Series(
     best_model.named_steps['rf'].feature_importances_,
@@ -111,15 +112,17 @@ feat_importance = pd.Series(
 print("\n Top 10 Features:\n", feat_importance.head(10))
 
 wandb.log({
-    "best_cv_rmse": -grid_search.best_score_,
-    "test_rmse": rmse,
-    "test_mae": mae,
-    "test_r2": r2
+    "best_cv_f1": grid_search.best_score_,
+    "test_accuracy": accuracy,
+    "test_precision": precision,
+    "test_recall": recall,
+    "test_f1": f1,
+    "test_auc": auc
 })
 
 os.makedirs("models", exist_ok=True)
-joblib.dump(best_model, "models/random_forest_regression.joblib")
+joblib.dump(best_model, "models/random_forest_classification.joblib")
 
 wandb.finish()
 
-print("\n DONE RF REGRESSION PIPELINE!")
+print("\n DONE RF CLASSIFICATION PIPELINE!")
