@@ -28,13 +28,14 @@ def evaluate_classification(y_test, y_pred, y_proba=None, model_name="Model"):
     report = classification_report(y_test, y_pred, output_dict=True)
     print(classification_report(y_test, y_pred))
 
-   
     recall_class_1 = report['1']['recall']
-    print("Nhận xét từ chuyên gia:")
+    print("Nhận xét")
     if acc > 0.8:
         print(f"- Model {model_name} có độ chính xác rất cao ({acc*100:.1f}%).")
+    elif acc >= 0.65:
+        print(f"- Model {model_name} có độ chính xác ở mức khá ({acc*100:.1f}%), tạm chấp nhận được.")
     else:
-        print(f"- Model {model_name} có độ chính xác trung bình, cần tuning thêm.")
+        print(f"- Model {model_name} có độ chính xác thấp ({acc*100:.1f}%), cần tuning mạnh hoặc đổi thuật toán.")
     
     if recall_class_1 > 0.75:
         print(f"- Khả năng nhận diện rượu NGON (Recall lớp 1) cực tốt ({recall_class_1*100:.1f}%).")
