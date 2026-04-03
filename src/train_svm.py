@@ -1,16 +1,22 @@
+import os
+import joblib
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import wandb
-import joblib
-import os
-import numpy as np
-
-from metrics import evaluate_classification
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold, cross_val_score
-from sklearn.svm import SVC
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from Learning_Curve import plot_learning_curve
+from metrics import evaluate_classification
+from sklearn.inspection import permutation_importance
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+from sklearn.model_selection import (
+    GridSearchCV,
+    StratifiedKFold,
+    cross_val_score,
+    train_test_split,
+)
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 
 # ======================
 # 1. Load Data
@@ -44,28 +50,26 @@ y = df["quality"]
 # 3. Split Data
 # ======================
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.2,
-    stratify=y,
-    random_state=42
+    X, y, test_size=0.2, stratify=y, random_state=42
 )
 
 # ======================
 # 4. WandB Init
 # ======================
-wandb.init(project="wine-quality", name="SVM_LIKE_LOGISTIC")
+wandb.init(project="wine-quality", name="SVM_LIKE_LOGISTIC_V2")
 
 # ======================
 # 5. Pipeline + CV (giống Logistic)
 # ======================
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('svm', SVC(
-        probability=True,
-        class_weight='balanced',
-        random_state=42
-    ))
-])
+pipeline = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        (
+            "svm",
+            SVC(probability=True, class_weight="balanced", random_state=42),
+        ),
+    ]
+)
 
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
@@ -75,32 +79,30 @@ for i, score in enumerate(cv_scores):
     print(f"Fold {i+1}: {score:.6f}")
     wandb.log({"cv_accuracy": score}, step=i)
 
-wandb.log({
-    "cv_mean_accuracy": cv_scores.mean(),
-    "cv_std": cv_scores.std()
-})
+wandb.log({"cv_mean_accuracy": cv_scores.mean(), "cv_std": cv_scores.std()})
 
 # ======================
 # 6. GridSearch
 # ======================
 param_grid = [
     {
-        'svm__kernel': ['linear'],
-        'svm__C': [0.01, 0.1, 1] # Thêm 0.01 để giảm Overfitting
+        "svm__kernel": ["linear"],
+        "svm__C": [0.01, 0.1, 1],
     },
     {
-        'svm__kernel': ['rbf'],
-        'svm__C': [0.1, 1, 10], 
-        'svm__gamma': ['scale', 'auto', 0.01, 0.05] # auto và giá trị nhỏ giúp đường biên mượt hơn
-    }
+        "svm__kernel": ["rbf"],
+        "svm__C": [0.1, 1, 10],
+        "svm__gamma": [
+            "scale",
+            "auto",
+            0.01,
+            0.05,
+        ],
+    },
 ]
 
 grid_search = GridSearchCV(
-    pipeline,
-    param_grid,
-    cv=cv,
-    scoring='f1',
-    n_jobs=-1
+    pipeline, param_grid, cv=cv, scoring="f1", n_jobs=-1
 )
 
 print("\nĐang chạy GridSearch SVM...")
@@ -133,10 +135,7 @@ y_proba_full = best_model.predict_proba(X_test)
 # 8. Evaluation
 # ======================
 evaluate_classification(
-    y_test,
-    y_pred,
-    y_proba=y_proba_full,
-    model_name="SVM"
+    y_test, y_pred, y_proba=y_proba_full, model_name="SVM"
 )
 
 test_acc = accuracy_score(y_test, y_pred)
@@ -145,27 +144,42 @@ auc = roc_auc_score(y_test, y_probas)
 
 print(f"\nBest params: {grid_search.best_params_}")
 
+print(
+    "\n--- Đang tính Feature Importance bằng Permutation Importance (Do SVM RBF không hỗ trợ trích xuất trực tiếp) ---"
+)
+perm_importance = permutation_importance(
+    best_model, X_test, y_test, n_repeats=5, random_state=42, n_jobs=-1
+)
+
+feat_importance = pd.Series(
+    perm_importance.importances_mean, index=X.columns
+).sort_values(ascending=False)
+
+print("\nTop 10 Features (Theo SVM):\n", feat_importance.head(10))
+
 # ======================
 # 9. Log WandB
 # ======================
-wandb.log({
-    "best_cv_f1": grid_search.best_score_,
-    "test_accuracy": test_acc,
-    "test_f1": test_f1,
-    "test_auc": auc,
-    "best_threshold": best_thresh,
-    "best_C": grid_search.best_params_.get('svm__C'),
-    "best_kernel": grid_search.best_params_.get('svm__kernel'),
-    "best_gamma": str(grid_search.best_params_.get('svm__gamma', 'N/A'))
-})
+wandb.log(
+    {
+        "best_cv_f1": grid_search.best_score_,
+        "test_accuracy": test_acc,
+        "test_f1": test_f1,
+        "test_auc": auc,
+        "best_threshold": best_thresh,
+        "best_C": grid_search.best_params_.get("svm__C"),
+        "best_kernel": grid_search.best_params_.get("svm__kernel"),
+        "best_gamma": str(grid_search.best_params_.get("svm__gamma", "N/A")),
+    }
+)
 
-wandb.log({
-    "confusion_matrix": wandb.plot.confusion_matrix(
-        probs=None,
-        y_true=y_test.values,
-        preds=y_pred
-    )
-})
+wandb.log(
+    {
+        "confusion_matrix": wandb.plot.confusion_matrix(
+            probs=None, y_true=y_test.values, preds=y_pred
+        )
+    }
+)
 
 # ======================
 # 10. Save Model

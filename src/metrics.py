@@ -25,7 +25,7 @@ def evaluate_classification(y_test, y_pred, y_proba=None, model_name="Model"):
         print(f"Log Loss:  {loss:.4f}")
 
     print("\nClassification Report:")
-  
+    report = classification_report(y_test, y_pred, output_dict=True)
     print(classification_report(y_test, y_pred))
 
     recall_class_1 = report['1']['recall']
