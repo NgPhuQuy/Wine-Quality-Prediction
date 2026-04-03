@@ -81,7 +81,7 @@ if __name__ == "__main__":
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate (Tỉ lệ báo nhầm)')
     plt.ylabel('True Positive Rate (Tỉ lệ bắt đúng)')
-    plt.title('So sánh ROC Curves giữa các thuật toán (Tuần 5)')
+    plt.title('So sánh ROC Curves giữa các thuật toán')
     plt.legend(loc="lower right")
     plt.grid(alpha=0.3)
 
