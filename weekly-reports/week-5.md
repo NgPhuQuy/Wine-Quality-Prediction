@@ -7,7 +7,7 @@
 ## 1. Công việc đã hoàn thành
 | Họ tên | MSSV | Công việc| Link commit/PR|
 |------|------|------|------|
-|Nguyễn Phú Quý|2351050147|Thiết kế evaluation pipeline chung||
+|Nguyễn Phú Quý|2351050147|Thiết kế evaluation pipeline chung|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/e2e6d72d17c9aece152501caef8c3ef7557e5eb9|
 |Đỗ Phước Vũ An|2351050001|Learning Curve, overfitting / underfitting|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/959816460803b10b7e8ccb474a024fe1042be520|
 |Phạm Thành Đạt|2351050028|Accuracy Precision, Recall, F1-score|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/4eac37dc93e73e1e3d7630eba9d1f9d61dc70fa9|
 |Nguyễn Hoàng Trúc Mai|2351050099|Confusion Matrix, ROC Curve và AUC|https://github.com/NgPhuQuy/Wine-Quality-Prediction/commit/c0fe26152bb18cbd17a6a007efe1fd5509fea168|
