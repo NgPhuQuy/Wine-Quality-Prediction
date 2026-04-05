@@ -119,6 +119,13 @@ evaluate_classification(
 
 auc = roc_auc_score(y_test, y_proba[:, 1])
 
+feat_importance = pd.Series(
+    best_model.named_steps['lr'].coef_[0],
+    index=best_model.named_steps['poly'].get_feature_names_out(X.columns)
+).sort_values(key=abs, ascending=False)
+
+print("\nTop 10 Features:\n", feat_importance.head(10))
+
 # ======================
 # 8. Log WandB
 # ======================
