@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import wandb
 
 
-def plot_learning_curve(model, model_name, X, y, cv, ax=None): # Để ax=None làm mặc định
+def plot_learning_curve(model, model_name, X, y, cv, ax=None):
     train_sizes, train_scores, val_scores = learning_curve(
         model, X, y, cv=cv, scoring='accuracy',
         train_sizes=np.linspace(0.1, 1.0, 10), n_jobs=-1
@@ -13,12 +13,11 @@ def plot_learning_curve(model, model_name, X, y, cv, ax=None): # Để ax=None l
     train_mean = train_scores.mean(axis=1)
     val_mean = val_scores.mean(axis=1)
 
-    # KIỂM TRA: Nếu ax là None thì tự tạo Figure và Axes mới
+    # Nếu không truyền ax, tự tạo một Figure mới để log riêng lẻ
+    standalone = False
     if ax is None:
         fig, ax = plt.subplots(figsize=(8, 6))
-        is_standalone = True # Đánh dấu đây là vẽ đơn lẻ
-    else:
-        is_standalone = False # Vẽ gộp vào subplots có sẵn
+        standalone = True
 
     ax.plot(train_sizes, train_mean, 'o-', label="Train")
     ax.plot(train_sizes, val_mean, 's-', label="Validation")
@@ -28,9 +27,12 @@ def plot_learning_curve(model, model_name, X, y, cv, ax=None): # Để ax=None l
     ax.legend()
     ax.grid(alpha=0.3)
 
-    # Chỉ Show và Log WandB nếu vẽ đơn lẻ
-    if is_standalone:
-        if wandb.run is not None:
-            # Lưu ảnh vào WandB
-            wandb.log({f"{model_name}_learning_curve": wandb.Image(plt)})
-        plt.show()
+    # Log lên WandB nếu đang trong một Run
+    if wandb.run is not None:
+        # Nếu là standalone, log trực tiếp figure hiện tại
+        # Nếu là một phần của subplot (vẽ 4 model), việc log sẽ do code bên ngoài đảm nhận sau khi vẽ xong cả 4
+        if standalone:
+            wandb.log({f"learning_curve_{model_name}": wandb.Image(fig)})
+            plt.close(fig) # Đóng để giải phóng bộ nhớ
+
+    return ax # Trả về ax để có thể dùng cho việc vẽ gộp 2x2 bên ngoài
