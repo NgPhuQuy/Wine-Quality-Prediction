@@ -20,6 +20,7 @@ df_red["type"] = 0
 df_white["type"] = 1 
 df = pd.concat([df_red, df_white], ignore_index=True)
 
+# Feature Engineering
 df["total_acidity"] = df["fixed acidity"] + df["volatile acidity"]
 df["sugar_alcohol_ratio"] = df["residual sugar"] / (df["alcohol"] + 1e-5)
 df["density_alcohol_interaction"] = df["density"] * df["alcohol"]
@@ -113,23 +114,37 @@ for run_cfg in configs:
         if not status_tags: status_tags.append("healthy")
         run.tags = run.tags + tuple(status_tags)
 
+        # 1. Log Learning Curve
         plot_learning_curve(best_model, run_cfg['name'], X_train, y_train, kf)
         lc_img = wandb.Image(plt)
         plt.close()
 
+        # 2. Xử lý Top 10 Feature Importance
         importances = best_model.named_steps['rf'].feature_importances_
         features = X.columns
-        indices = np.argsort(importances)
+        indices = np.argsort(importances)[-10:] # Lấy top 10 cuối cùng
+        
+        # Vẽ biểu đồ ngang cho Top 10
         plt.figure(figsize=(10, 6))
         plt.barh(range(len(indices)), importances[indices], color='skyblue', align='center')
         plt.yticks(range(len(indices)), [features[i] for i in indices])
+        plt.title(f"Top 10 Feature Importance - {run_cfg['name']}")
+        plt.xlabel("Importance Score")
         plt.tight_layout()
         fi_img = wandb.Image(plt)
         plt.close()
 
+        # Tạo bảng dữ liệu cho WandB Plot (Dạng tương tác)
+        fi_table = wandb.Table(
+            columns=["Feature", "Importance"],
+            data=[[features[i], importances[i]] for i in reversed(indices)]
+        )
+
+        # 3. Tổng hợp log lên WandB
         wandb.log({
             "learning_curve": lc_img,
-            "feature_importance": fi_img,
+            "feature_importance_image": fi_img,
+            "top_10_features_chart": wandb.plot.bar(fi_table, "Feature", "Importance", title="Top 10 Features"),
             "confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=y_test.values, preds=y_test_pred, class_names=["Normal", "Good"]),
             "pr_curve": wandb.plot.pr_curve(y_true=y_test.values, y_probas=y_test_proba, labels=["Normal", "Good"]),
             "best_cv_f1": cv_f1,
@@ -145,6 +160,7 @@ for run_cfg in configs:
             run.tags = run.tags + ("champion",)
             print(f"New candidate champion found: {best_run_name} with CV F1: {cv_f1:.4f}")
 
+        # Lưu Artifact cho run hiện tại
         temp_name = f"temp_{run_cfg['name']}.joblib"
         joblib.dump(best_model, temp_name)
         artifact = wandb.Artifact(run_cfg['name'], type='model')
