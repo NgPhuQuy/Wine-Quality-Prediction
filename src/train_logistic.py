@@ -1,5 +1,7 @@
 import os
 import joblib
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -46,74 +48,79 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-
-
-
-
 # ==========================================
 # 2. CONFIGURATIONS & HYPERPARAMETERS
 # ==========================================
+# ==========================================
+# 2. CONFIGURATIONS & HYPERPARAMETERS (BỘ 7 TINH TÚY)
+# ==========================================
 configs = [
+    # 1. Quán quân cân bằng \
     {
-        "name": "logistic_run3",
-        "metric": "recall",
-        "class_weight": None,
-        "smote": False,
-        "threshold": 0.2,
-        "penalty": "l2",
-    },
-    {
-        "name": "logistic_run5",
-        "metric": "recall",
-        "class_weight": {0: 1, 1: 3},
-        "smote": False,
-        "threshold": 0.5,
-        "penalty": "l2",
-    },
-    {
-        "name": "logistic_run1",
-        "metric": "recall",
-        "class_weight": None,
-        "smote": False,
-        "threshold": 0.3,
-        "penalty": "l2",
-    },
-    {
-        "name": "logistic_run2",
-        "metric": "recall",
+        "name": "lg_run1", 
+        "metric": "f1",
         "class_weight": None,
         "smote": False,
         "threshold": 0.25,
         "penalty": "l2",
     },
+    # 2. Quán quân bao phủ 
     {
-        "name": "logistic_run4",
-        "metric": "recall",
-        "class_weight": {0: 1, 1: 2.5},
-        "smote": False,
-        "threshold": 0.5,
-        "penalty": "l2",
-    },
-    {
-        "name": "logistic_run6",
+        "name": "lg_run2", 
         "metric": "recall",
         "class_weight": {0: 1, 1: 3.5},
         "smote": False,
         "threshold": 0.5,
         "penalty": "l2",
     },
+    # 3. Quán quân SMOTE )
     {
-        "name": "logistic_run7",
-        "metric": "recall",
-        "class_weight": {0: 1, 1: 2.5},
-        "smote": False,
-        "threshold": 0.3,
+        "name": "lg_run3", 
+        "metric": "f1",
+        "class_weight": None,
+        "smote": True,
+        "threshold": 0.6,
         "penalty": "l2",
     },
+    # 4. Quán quân lọc nhiễu 
+    {
+        "name": "lg_run4", 
+        "metric": "f1",
+        "class_weight": "balanced",
+        "smote": False,
+        "threshold": 0.6,
+        "penalty": "l1",
+    },
+    
+    
+    # 7. Quán quân bắn tỉa cực đoan 
+    {
+        "name": "lg_run5", 
+        "metric": "f1",
+        "class_weight": {0: 1, 1: 3},
+        "smote": False,
+        "threshold": 0.75,
+        "penalty": "l2",
+    },
+    {
+        "name": "lg_run6", 
+        "metric": "f1",
+        "class_weight": "balanced", 
+        "smote": True,              
+        "threshold": 0.65,          
+        "penalty": "l2",
+    },
+    {
+        "name": "lg_run7", 
+        "metric": "f1",
+        "class_weight": "balanced", 
+        "smote": True, 
+        "threshold": 0.7,           
+        "penalty": "l1",            
+    }
 ]
-
 MAX_OVERFIT_GAP = 0.1
-MIN_F1_CV = 0.60
+MIN_F1_CV = 0.4
 best_f1_cv = -1.0
 best_model_overall = None
 best_run_name = ""
@@ -155,9 +162,10 @@ for config in configs:
         pipeline = ImbPipeline(steps)
 
         # ------------------------------------------
-        # Cross Validation (Tracking AUC)
+        # Cross Validation (Tracking AUC & F1)
         # ------------------------------------------
         cv_auc_scores = []
+        cv_f1_scores = [] # Thêm để lưu F1 từng fold
         for fold, (train_idx, val_idx) in enumerate(kf.split(X_train, y_train), 1):
             X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
             y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
@@ -165,9 +173,14 @@ for config in configs:
             pipeline.fit(X_tr, y_tr)
             y_val_proba = pipeline.predict_proba(X_val)[:, 1]
             cv_auc_scores.append(roc_auc_score(y_val, y_val_proba))
+            
+            # Tính F1 cho fold hiện tại dựa trên threshold của config
+            y_val_pred_fold = (y_val_proba >= config["threshold"]).astype(int)
+            cv_f1_scores.append(f1_score(y_val, y_val_pred_fold))
 
         mean_cv_auc = np.mean(cv_auc_scores)
         std_cv_auc = np.std(cv_auc_scores)
+        mean_cv_f1 = np.mean(cv_f1_scores) # Tính trung bình F1 từ CV
 
         # ------------------------------------------
         # GridSearch
@@ -194,8 +207,6 @@ for config in configs:
         y_proba = best_model.predict_proba(X_test)[:, 1]
         y_pred = (y_proba >= config["threshold"]).astype(int)
 
-        # Tính test_metric_score trực tiếp bằng hàm mặc định của sklearn luôn!
-        # Vì trong config của bạn toàn bộ đều là 'recall' nên mình gọi thẳng recall_score
         test_metric_score = recall_score(y_test, y_pred)
         test_auc = roc_auc_score(y_test, y_proba)
         overfit_gap = abs(mean_cv_auc - test_auc)
@@ -215,6 +226,7 @@ for config in configs:
         stability_history.append(
             {
                 "name": config["name"],
+                "cv_f1": round(mean_cv_f1, 4), # Thêm vào để theo dõi
                 "mean_cv_auc": round(mean_cv_auc, 4),
                 "test_auc": round(test_auc, 4),
                 "overfit_gap": round(overfit_gap, 4),
@@ -232,8 +244,7 @@ for config in configs:
         status_tags = []
         if overfit_gap > MAX_OVERFIT_GAP:
             status_tags.append("overfitting")
-        # Sử dụng F1_score test thực tế để đánh giá underfit
-        if t_f1 < MIN_F1_CV:
+        if mean_cv_f1 < MIN_F1_CV:
             status_tags.append("underfitting")
         if not status_tags:
             status_tags.append("healthy")
@@ -247,7 +258,7 @@ for config in configs:
         # 2. Xử lý Top 10 Feature Importance (Hệ số Coefficients)
         importances = best_model.named_steps["lr"].coef_[0]
         features = X.columns
-        indices = np.argsort(np.abs(importances))[-10:]  # Lấy top 10
+        indices = np.argsort(np.abs(importances))[-10:]
 
         plt.figure(figsize=(10, 6))
         plt.barh(
@@ -259,8 +270,6 @@ for config in configs:
         plt.yticks(range(len(indices)), [features[i] for i in indices])
         plt.axvline(x=0, color="red", linestyle="--", linewidth=0.8)
         plt.title(f"Top 10 Feature Importance - {config['name']}")
-        plt.xlabel("Coefficient Value")
-        plt.tight_layout()
         fi_img = wandb.Image(plt)
         plt.close()
 
@@ -289,6 +298,7 @@ for config in configs:
                     labels=["Normal", "Good"],
                 ),
                 "mean_cv_auc": mean_cv_auc,
+                "mean_cv_f1": mean_cv_f1, # Log thêm CV F1
                 "cv_std_auc": std_cv_auc,
                 "overfit_gap": overfit_gap,
                 "test_auc": test_auc,
@@ -299,14 +309,14 @@ for config in configs:
             }
         )
 
-        # Cập nhật ứng cử viên Champion (Dựa trên F1 score cao nhất và "healthy")
-        if "healthy" in status_tags and t_f1 > best_f1_cv:
-            best_f1_cv = t_f1
+        # Cập nhật ứng cử viên Champion (Dựa trên CV F1 cao nhất và "healthy")
+        if "healthy" in status_tags and mean_cv_f1 > best_f1_cv:
+            best_f1_cv = mean_cv_f1
             best_model_overall = best_model
             best_run_name = config["name"]
             run.tags = run.tags + ("champion",)
             print(
-                f"New candidate champion found: {best_run_name} with Test F1: {t_f1:.4f}"
+                f"New candidate champion found: {best_run_name} with CV F1: {mean_cv_f1:.4f}"
             )
 
         # Lưu Artifact cho run hiện tại
@@ -323,7 +333,7 @@ for config in configs:
 if best_model_overall:
     print("-" * 30)
     print(f"FINAL SELECTION: {best_run_name}")
-    print(f"BEST TEST F1 SCORE: {best_f1_cv:.4f}")
+    print(f"BEST CV F1 SCORE: {best_f1_cv:.4f}")
     print("-" * 30)
 
     champion_path = "models/logistic_model.joblib"
@@ -337,14 +347,14 @@ if best_model_overall:
         final_artifact = wandb.Artifact("champion-model", type="model")
         final_artifact.add_file(champion_path)
         final_run.log_artifact(final_artifact)
-        final_run.log({"final_best_test_f1": best_f1_cv})
+        final_run.log({"final_best_cv_f1": best_f1_cv})
 else:
     print("No healthy models met the minimum F1 threshold.")
 
-# In bảng xếp hạng cuối cùng
+# In bảng xếp hạng cuối cùng (Sắp xếp theo CV F1 giảm dần)
 print("\n" + "=" * 80)
-print("BẢNG XẾP HẠNG ĐỘ ỔN ĐỊNH & CHỈ SỐ THỰC CHIẾN (Sắp xếp theo Overfit Gap)")
+print("BẢNG XẾP HẠNG ĐỘ ỔN ĐỊNH & CHỈ SỐ THỰC CHIẾN (Sắp xếp theo CV F1)")
 print("=" * 80)
 df_stability = pd.DataFrame(stability_history)
-df_stability = df_stability.sort_values(by="overfit_gap")
+df_stability = df_stability.sort_values(by="cv_f1", ascending=False)
 print(df_stability.to_string(index=False))
