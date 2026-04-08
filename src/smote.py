@@ -9,7 +9,9 @@ from Learning_Curve import plot_learning_curve
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
-from imblearn.over_sampling import SMOTE, BorderlineSMOTE
+
+# QUAN TRỌNG: Sử dụng Pipeline và SMOTE từ imblearn
+from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
 
 # ==========================================
@@ -35,39 +37,69 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # ==========================================
-# 2. FINAL OPTIMIZED CONFIGS
+# 2. CONFIGURATIONS FOR SMOTE RUNS
+# ==========================================
+# Thử nghiệm các mức độ SMOTE khác nhau (sampling_strategy)
+# ==========================================
+# 2. OPTIMIZED CONFIGURATIONS (Anti-Overfitting)
+# ==========================================
+# ==========================================
+# 2. DIVERSE OPTIMIZED CONFIGS
 # ==========================================
 configs = [
-    {"name": "rf_run_1", "sampling_ratio": 0.4, "params": {
-        'rf__n_estimators': [1000], 'rf__max_depth': [8], 'rf__min_samples_split': [50], 
-        'rf__min_samples_leaf': [25], 'rf__max_features': ['sqrt'], 'rf__max_samples': [0.7]
-    }},
-    {"name": "rf_run_2", "sampling_ratio": 0.4, "params": {
-        'rf__n_estimators': [2000], 'rf__max_depth': [7], 'rf__min_samples_split': [60], 
-        'rf__min_samples_leaf': [30], 'rf__max_features': ['log2'], 'rf__max_samples': [0.65]
-    }},
-    {"name": "rf_run_3", "sampling_ratio": 0.45, "params": {
-        'rf__n_estimators': [1200], 'rf__max_depth': [10], 'rf__min_samples_split': [40], 
-        'rf__min_samples_leaf': [20], 'rf__max_features': [0.2], 'rf__max_samples': [0.8]
-    }},
-    {"name": "rf_run_4", "sampling_ratio": 0.35, "params": {
-        'rf__n_estimators': [1500], 'rf__max_depth': [9], 'rf__min_samples_split': [70], 
-        'rf__min_samples_leaf': [35], 'rf__max_features': [0.15], 'rf__max_samples': [0.6]
-    }},
-    {"name": "rf_run_5", "sampling_ratio": 0.42, "params": {
-        'rf__n_estimators': [1100], 'rf__max_depth': [9], 'rf__min_samples_split': [45], 
-        'rf__min_samples_leaf': [22], 'rf__max_features': ['sqrt'], 'rf__max_samples': [0.75]
-    }}
+    # HƯỚNG 1: "THE SPECIALIST" - Ưu tiên Precision cực cao
+    # Phù hợp nếu bạn muốn mô hình chỉ "phán" khi cực kỳ chắc chắn là rượu ngon
+    {
+        "name": "rf_smote_precision_focus", 
+        "sampling_ratio": 0.35, # Ít dữ liệu ảo hơn để giữ nguyên bản chất data
+        "params": {
+            'rf__n_estimators': [1500],
+            'rf__max_depth': [9],
+            'rf__min_samples_split': [70], # Split rất khắt khe
+            'rf__min_samples_leaf': [35],  # Lá lớn để tránh nhiễu
+            'rf__max_features': [0.15],    # Mỗi split chỉ xem xét rất ít tính năng
+            'rf__max_samples': [0.65]       # Tính ngẫu nhiên cực cao
+        }
+    },
+    
+    # HƯỚNG 2: "THE EXPLORER" - Thử nghiệm k-Neighbors của SMOTE
+    # Chỉnh k_neighbors trong SMOTE (cần sửa code khởi tạo Pipeline một chút)
+    {
+        "name": "rf_smote_k_neighbors_adj", 
+        "sampling_ratio": 0.45,
+        "params": {
+            'rf__n_estimators': [1000],
+            'rf__max_depth': [10],
+            'rf__min_samples_split': [40],
+            'rf__min_samples_leaf': [20],
+            'rf__max_features': ['log2'],  # Thử log2 thay vì sqrt
+            'rf__max_samples': [0.8]
+        }
+    },
+
+    # HƯỚNG 3: "THE STABILIZER" - Cân bằng giữa các Run V3 bạn đã chạy
+    {
+        "name": "rf_smote_v4_ultra_stable", 
+        "sampling_ratio": 0.4,
+        "params": {
+            'rf__n_estimators': [2000],    # Tăng mạnh số lượng cây để làm mượt dự đoán
+            'rf__max_depth': [7],          # Cây rất nông để chống overfit tuyệt đối
+            'rf__min_samples_split': [50],
+            'rf__min_samples_leaf': [25],
+            'rf__max_features': [0.3],     # Cho phép mỗi cây nhìn rộng hơn một chút
+            'rf__max_samples': [0.7]
+        }
+    }
 ]
 
 MAX_OVERFIT_GAP = 0.1 
-MIN_F1_CV = 0.55
+MIN_F1_CV = 0.60 
 best_f1_cv = -1.0
 best_model_overall = None
 best_run_name = ""
 
 # ==========================================
-# 3. TRAINING LOOP
+# 3. TRAINING LOOP WITH SMOTE
 # ==========================================
 for run_cfg in configs:
     with wandb.init(
@@ -77,18 +109,18 @@ for run_cfg in configs:
         config=run_cfg
     ) as run:
         
-        print(f"Executing: {run_cfg['name']}")
+        print(f"Executing SMOTE Run: {run_cfg['name']}")
 
-        # Lựa chọn phương pháp SMOTE 
-        if run_cfg['name'] == "rf_run_5":
-            smote_method = BorderlineSMOTE(sampling_strategy=run_cfg['sampling_ratio'], random_state=42)
-        else:
-            smote_method = SMOTE(sampling_strategy=run_cfg['sampling_ratio'], random_state=42)
-
-        # Sử dụng ImbPipeline để bọc SMOTE và RF
+        # Pipeline tích hợp SMOTE
+        # sampling_strategy: tỉ lệ giữa lớp thiểu số/đa số sau khi resample
+        # pipeline = ImbPipeline([
+        #     ('smote', SMOTE(sampling_strategy=run_cfg['sampling_ratio'], random_state=42)),
+        #     ('rf', RandomForestClassifier(random_state=42)) 
+        # ])
+        # Thêm k_neighbors=3 thay vì mặc định là 5 để SMOTE tập trung vào các nhóm nhỏ hơn
         pipeline = ImbPipeline([
-            ('smote', smote_method),
-            ('rf', RandomForestClassifier(random_state=42))
+            ('smote', SMOTE(sampling_strategy=run_cfg['sampling_ratio'], k_neighbors=3, random_state=42)),
+            ('rf', RandomForestClassifier(random_state=42)) 
         ])
         
         kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -97,7 +129,7 @@ for run_cfg in configs:
         grid_search.fit(X_train, y_train)
         best_model = grid_search.best_estimator_
 
-        # Đánh giá kết quả
+        # Đánh giá
         y_test_pred = best_model.predict(X_test)
         y_test_proba = best_model.predict_proba(X_test)
         y_train_pred = best_model.predict(X_train)
@@ -109,18 +141,19 @@ for run_cfg in configs:
         test_f1 = f1_score(y_test, y_test_pred)
         overfit_gap = train_f1 - test_f1
 
-        status_tags = ["SMOTE_Run"]
+        # Gán Tags
+        status_tags = ["SMOTE_Method"]
         if overfit_gap > MAX_OVERFIT_GAP: status_tags.append("overfitting")
         if cv_f1 < MIN_F1_CV: status_tags.append("underfitting")
         if len(status_tags) == 1: status_tags.append("healthy")
         run.tags = run.tags + tuple(status_tags)
 
-        # Log Learning Curve
+        # 1. Log Learning Curve
         plot_learning_curve(best_model, run_cfg['name'], X_train, y_train, kf)
         lc_img = wandb.Image(plt)
         plt.close()
 
-        # Xử lý Feature Importance
+        # 2. Xử lý Feature Importance
         importances = best_model.named_steps['rf'].feature_importances_
         features = X.columns
         indices = np.argsort(importances)[-10:]
@@ -130,10 +163,10 @@ for run_cfg in configs:
             data=[[features[i], importances[i]] for i in reversed(indices)]
         )
 
-        # Log lên WandB
+        # 3. Tổng hợp log lên WandB
         wandb.log({
             "learning_curve": lc_img,
-            "top_10_features_chart": wandb.plot.bar(fi_table, "Feature", "Importance", title="Top 10 Features"),
+            "top_10_features_chart": wandb.plot.bar(fi_table, "Feature", "Importance", title="Top 10 Features (SMOTE)"),
             "confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=y_test.values, preds=y_test_pred, class_names=["Normal", "Good"]),
             "pr_curve": wandb.plot.pr_curve(y_true=y_test.values, y_probas=y_test_proba, labels=["Normal", "Good"]),
             "best_cv_f1": cv_f1,
@@ -148,10 +181,9 @@ for run_cfg in configs:
             best_model_overall = best_model
             best_run_name = run_cfg['name']
             run.tags = run.tags + ("champion",)
-            print(f"New candidate champion found: {best_run_name} with CV F1: {cv_f1:.4f}")
 
         # Lưu Artifact
-        temp_name = f"temp_{run_cfg['name']}.joblib"
+        temp_name = f"temp_smote_{run_cfg['name']}.joblib"
         joblib.dump(best_model, temp_name)
         artifact = wandb.Artifact(run_cfg['name'], type='model')
         artifact.add_file(temp_name)
@@ -162,8 +194,6 @@ for run_cfg in configs:
 # 4. EXPORT CHAMPION
 # ==========================================
 if best_model_overall:
-    print("-" * 30)
-    print(f"FINAL SELECTION: {best_run_name}")
-    print("-" * 30)
+    print(f"\n--- BEST SMOTE MODEL: {best_run_name} (CV F1: {best_f1_cv:.4f}) ---")
     os.makedirs("models", exist_ok=True)
-    joblib.dump(best_model_overall, "models/rf_model.joblib")
+    joblib.dump(best_model_overall, "models/rf_smote_best_model.joblib")

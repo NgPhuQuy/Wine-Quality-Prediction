@@ -67,7 +67,7 @@ best_run_name = ""
 for run_cfg in configs:
  
     with wandb.init(
-        project="Wine-Quality-Prediction-XGB",
+        project="Wine-Quality-Prediction",
         name=run_cfg['name'],
         config=run_cfg['params']
     ) as run:
@@ -159,5 +159,3 @@ if best_model_overall:
     print("4. Feature Engineering: Added 'total_acidity', 'sugar_alcohol_ratio', 'density_alcohol_interaction'")
     print("5. Status: Ready for Backend integration.")
     print("="*30)
-
-    
