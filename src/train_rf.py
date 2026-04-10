@@ -52,7 +52,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 configs = [
     {
         "name": "run_1_baseline_basic", 
-        "smote_method": "standard", "sampling_ratio": 0.3, 
+        "smote_method": "standard", "sampling_ratio": 0.3,
         "param_grid": {
             'rf__n_estimators': [700],
             'rf__max_depth': [10],

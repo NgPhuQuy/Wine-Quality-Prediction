@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { predictWine } from "../api/mockApi";
+import { predictWine } from "../api/Api";
 
 const ranges = {
   fixed_acidity: [4, 16],
@@ -35,19 +35,25 @@ function WineForm({ setResult, setLoading, setChartData }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setChartData(form);
-    try {
-      const response = await predictWine(form);
-      if (response && response.quality !== undefined) {
-        setResult(response.quality);
-      } else { throw new Error("Invalid response"); }
-    } catch (error) {
-      console.error(error);
-      alert("API server connection error!");
-    } finally { setLoading(false); }
-  };
+  e.preventDefault();
+  setLoading(true);
+  setChartData(form);
+  
+  try {
+    const response = await predictWine(form);
+    if (response && response.status === "success") {
+      // Dùng raw_score (giả sử từ 0 -> 1) nhân cho 10 để ra thang điểm 10
+      // Hoặc nếu BE trả về điểm chất lượng cụ thể, hãy dùng đúng số đó.
+      const calculatedScore = (response.raw_score * 10).toFixed(2); 
+      setResult(calculatedScore); 
+    }
+  } catch (error) {
+    console.error("Lỗi chi tiết:", error);
+    alert("API server connection error!");
+  } finally { 
+    setLoading(false); 
+  }
+};
 
   // Định nghĩa style cho nút + và -
   const btnStyle = {

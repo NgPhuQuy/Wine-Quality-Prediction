@@ -15,11 +15,11 @@ COLUMNS = [
 
 def predict_wine(data):
     try:
-        # # Chuyển data sang dạng dict nếu nó là object (để dùng .get cho an toàn)
-        # if hasattr(data, '__dict__'):
-        #     data = data.__dict__
-        # else:
-        #     data = data
+        # Chuyển data sang dạng dict nếu nó là object (để dùng .get cho an toàn)
+        if hasattr(data, '__dict__'):
+            data = data.__dict__
+        else:
+            data = data
 
         # Lấy giá trị và xử lý lỗi tên biến có/không có gạch dưới
         f_acid = float(data.get("fixed_acidity") or data.get("fixed acidity") or 0)
