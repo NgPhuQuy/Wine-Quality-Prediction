@@ -4,194 +4,245 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import wandb
+import matplotlib
+matplotlib.use('Agg') 
 from Learning_Curve import plot_learning_curve
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
 from metrics import evaluate_classification
-from sklearn.inspection import permutation_importance
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
-from sklearn.model_selection import (
-    GridSearchCV,
-    StratifiedKFold,
-    cross_val_score,
-    train_test_split,
-)
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.inspection import permutation_importance
+from sklearn.metrics import (
+    accuracy_score, f1_score, precision_score, 
+    recall_score, roc_auc_score
+)
+from sklearn.model_selection import StratifiedKFold, train_test_split
+from sklearn.preprocessing import StandardScaler
 
-# ======================
-# 1. Load Data
-# ======================
+# ==========================================
+# 1. LOAD & PREPROCESS DATA
+# ==========================================
 df_red = pd.read_csv("data/winequality-red.csv", sep=";")
 df_white = pd.read_csv("data/winequality-white.csv", sep=";")
-
-df_red["type"] = 0
-df_white["type"] = 1
-
+df_red["type"], df_white["type"] = 0, 1
 df = pd.concat([df_red, df_white], ignore_index=True)
 
-# ======================
-# 2. Feature Engineering
-# ======================
+# Feature Engineering
 df["total_acidity"] = df["fixed acidity"] + df["volatile acidity"]
 df["sugar_alcohol_ratio"] = df["residual sugar"] / (df["alcohol"] + 1e-5)
 df["density_alcohol_interaction"] = df["density"] * df["alcohol"]
-
-# 🔥 Đồng bộ Logistic
 df["quality"] = (df["quality"] >= 7).astype(int)
-
-# Fix NaN
-df.replace([np.inf, -np.inf], np.nan, inplace=True)
-df.dropna(inplace=True)
 
 X = df.drop("quality", axis=1)
 y = df["quality"]
 
-# ======================
-# 3. Split Data
-# ======================
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, stratify=y, random_state=42
 )
+kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-# ======================
-# 4. WandB Init
-# ======================
-wandb.init(project="wine-quality", name="SVM_LIKE_LOGISTIC_V2")
-
-# ======================
-# 5. Pipeline + CV (giống Logistic)
-# ======================
-pipeline = Pipeline(
-    [
-        ("scaler", StandardScaler()),
-        (
-            "svm",
-            SVC(probability=True, class_weight="balanced", random_state=42),
-        ),
-    ]
-)
-
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
-cv_scores = cross_val_score(pipeline, X_train, y_train, cv=cv)
-
-for i, score in enumerate(cv_scores):
-    print(f"Fold {i+1}: {score:.6f}")
-    wandb.log({"cv_accuracy": score}, step=i)
-
-wandb.log({"cv_mean_accuracy": cv_scores.mean(), "cv_std": cv_scores.std()})
-
-# ======================
-# 6. GridSearch
-# ======================
-param_grid = [
+# ==========================================
+# 2. CONFIGURATIONS
+# ==========================================
+configs = [
+    # --- NHÓM 1: PHÁT TRIỂN TỪ RUN 7 (Ưu tiên F1-Score & Cân bằng) ---
     {
-        "svm__kernel": ["linear"],
-        "svm__C": [0.01, 0.1, 1],
+        "name": "svm_v2_run1", 
+        "kernel": "rbf", "C": 100.0, "smote": True, "threshold": 0.65 # Hạ nhẹ threshold của run 7 để tăng Recall
     },
     {
-        "svm__kernel": ["rbf"],
-        "svm__C": [0.1, 1, 10],
-        "svm__gamma": [
-            "scale",
-            "auto",
-            0.01,
-            0.05,
-        ],
+        "name": "svm_v2_run2", 
+        "kernel": "rbf", "C": 150.0, "smote": True, "threshold": 0.7  # Tăng C để model học quyết liệt hơn
+    },
+    {
+        "name": "svm_v2_run3", 
+        "kernel": "rbf", "C": 100.0, "smote": True, "threshold": 0.7  # GIỮ NGUYÊN RUN 7 GỐC
+    },
+
+    # --- NHÓM 2: PHÁT TRIỂN TỪ RUN 3 & 5 (Ưu tiên Recall - Bắt rượu tốt) ---
+    {
+        "name": "svm_v2_run4", 
+        "kernel": "rbf", "C": 1.0, "smote": True, "threshold": 0.5   # Cải tiến Run 3: Hạ threshold để Recall > 0.7
+    },
+    {
+        "name": "svm_v2_run5", 
+        "kernel": "rbf", "C": 5.0, "smote": True, "threshold": 0.55  # Kết hợp sức mạnh Run 3 và độ gắt của Run 7
+    },
+
+    # --- NHÓM 3: TÌM ĐIỂM CÂN BẰNG MỚI (Hybrid) ---
+    {
+        "name": "svm_v2_run6", 
+        "kernel": "rbf", "C": 50.0, "smote": True, "threshold": 0.6   # Mức C trung gian, threshold an toàn
+    },
+    {
+        "name": "svm_v2_run7", 
+        "kernel": "rbf", "C": 20.0, "smote": True, "threshold": 0.5   # Low threshold với C vừa phải
     },
 ]
 
-grid_search = GridSearchCV(
-    pipeline, param_grid, cv=cv, scoring="f1", n_jobs=-1
-)
+MAX_OVERFIT_GAP = 0.1
+MIN_F1_CV = 0.5
+best_f1_cv = -1.0
+best_model_overall = None
+best_run_name = ""
+stability_history = []
 
-print("\nĐang chạy GridSearch SVM...")
-grid_search.fit(X_train, y_train)
-
-best_model = grid_search.best_estimator_
-
-# ======================
-# 7. Threshold tuning (giống Logistic)
-# ======================
-y_probas = best_model.predict_proba(X_test)[:, 1]
-
-best_thresh = 0.5
-best_f1 = 0
-
-for t in np.linspace(0.3, 0.7, 9):
-    preds = (y_probas > t).astype(int)
-    f1 = f1_score(y_test, preds)
-
-    if f1 > best_f1:
-        best_f1 = f1
-        best_thresh = t
-
-print(f"\nBest threshold: {best_thresh}")
-
-y_pred = (y_probas > best_thresh).astype(int)
-y_proba_full = best_model.predict_proba(X_test)
-
-# ======================
-# 8. Evaluation
-# ======================
-evaluate_classification(
-    y_test, y_pred, y_proba=y_proba_full, model_name="SVM"
-)
-
-test_acc = accuracy_score(y_test, y_pred)
-test_f1 = f1_score(y_test, y_pred)
-auc = roc_auc_score(y_test, y_probas)
-
-print(f"\nBest params: {grid_search.best_params_}")
-
-print(
-    "\n--- Đang tính Feature Importance bằng Permutation Importance (Do SVM RBF không hỗ trợ trích xuất trực tiếp) ---"
-)
-perm_importance = permutation_importance(
-    best_model, X_test, y_test, n_repeats=5, random_state=42, n_jobs=-1
-)
-
-feat_importance = pd.Series(
-    perm_importance.importances_mean, index=X.columns
-).sort_values(ascending=False)
-
-print("\nTop 10 Features (Theo SVM):\n", feat_importance.head(10))
-
-# ======================
-# 9. Log WandB
-# ======================
-wandb.log(
-    {
-        "best_cv_f1": grid_search.best_score_,
-        "test_accuracy": test_acc,
-        "test_f1": test_f1,
-        "test_auc": auc,
-        "best_threshold": best_thresh,
-        "best_C": grid_search.best_params_.get("svm__C"),
-        "best_kernel": grid_search.best_params_.get("svm__kernel"),
-        "best_gamma": str(grid_search.best_params_.get("svm__gamma", "N/A")),
-    }
-)
-
-wandb.log(
-    {
-        "confusion_matrix": wandb.plot.confusion_matrix(
-            probs=None, y_true=y_test.values, preds=y_pred
-        )
-    }
-)
-
-# ======================
-# 10. Save Model
-# ======================
 os.makedirs("models", exist_ok=True)
-joblib.dump(best_model, "models/svm_model.joblib")
 
-# ======================
-# 11. Learning Curve
-# ======================
-plot_learning_curve(best_model, "SVM", X_train, y_train, cv)
+# ==========================================
+# 3. TRAINING LOOP
+# ==========================================
+for config in configs:
+    with wandb.init(
+        entity="ngphuquy241-tr-ng-i-h-c-m-th-nh-ph-h-ch-minh",
+        project="Wine-Quality-Prediction",
+        name=config["name"],
+        tags=["svm", config["kernel"], "smote" if config["smote"] else "no-smote"],
+    ) as run:
 
-wandb.finish()
+        print(f"\n🚀 Executing SVM: {config['name']}")
 
-print("\nDONE! SVM aligned with Logistic.")
+        # Setup Pipeline
+        steps = [("scaler", StandardScaler())]
+        if config["smote"]:
+            steps.append(("smote", SMOTE(random_state=42)))
+        
+        steps.append(("svm", SVC(
+            kernel=config["kernel"], 
+            C=config["C"], 
+            probability=True, 
+            class_weight="balanced", 
+            cache_size=1000,
+            random_state=42
+        )))
+        pipeline = ImbPipeline(steps)
+
+        # Cross Validation Manual (AUC & F1)
+        cv_f1_scores, cv_auc_scores = [], []
+        for train_idx, val_idx in kf.split(X_train, y_train):
+            X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
+            y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
+
+            pipeline.fit(X_tr, y_tr)
+            y_val_proba = pipeline.decision_function(X_val)
+            
+            cv_auc_scores.append(roc_auc_score(y_val, y_val_proba))
+            cv_f1_scores.append(f1_score(y_val, (y_val_proba >= config["threshold"]).astype(int)))
+
+        mean_cv_f1 = np.mean(cv_f1_scores)
+        mean_cv_auc = np.mean(cv_auc_scores)
+        std_cv_auc = np.std(cv_auc_scores)
+
+        # Huấn luyện trên toàn tập train
+        pipeline.fit(X_train, y_train)
+        
+        # Test Evaluation
+        y_proba = pipeline.decision_function(X_test)
+        y_pred = (y_proba >= config["threshold"]).astype(int)
+
+        t_f1 = f1_score(y_test, y_pred)
+        t_auc = roc_auc_score(y_test, y_proba)
+        overfit_gap = abs(mean_cv_auc - t_auc)
+
+        # Log History
+        stability_history.append({
+            "name": config["name"],
+            "cv_f1": round(mean_cv_f1, 4),
+            "test_f1": round(t_f1, 4),
+            "overfit_gap": round(overfit_gap, 4),
+            "prec": round(precision_score(y_test, y_pred), 4),
+            "rec": round(recall_score(y_test, y_pred), 4),
+            "acc": round(accuracy_score(y_test, y_pred), 4),
+            "cv_std_auc": round(std_cv_auc, 4)
+        })
+
+        # --- Gắn Tag Trạng Thái ---
+        status_tags = []
+        if overfit_gap > MAX_OVERFIT_GAP: status_tags.append("overfitting")
+        if mean_cv_f1 < MIN_F1_CV: status_tags.append("underfitting")
+        if not status_tags: status_tags.append("healthy")
+        run.tags = run.tags + tuple(status_tags)
+
+        # 1. Log Learning Curve
+        plot_learning_curve(pipeline, config["name"], X_train, y_train, kf)
+        lc_img = wandb.Image(plt.gcf())
+        plt.close()
+
+        # 2. Permutation Importance
+        r = permutation_importance(pipeline, X_test, y_test, n_repeats=5, random_state=42)
+        indices = np.argsort(r.importances_mean)[-10:]
+        plt.figure(figsize=(10, 6))
+        plt.barh(range(len(indices)), r.importances_mean[indices], color="lightgreen")
+        plt.yticks(range(len(indices)), [X.columns[i] for i in indices])
+        plt.title(f"Permutation Importance - {config['name']}")
+        fi_img = wandb.Image(plt.gcf())
+        plt.close()
+
+        # 3. Log WandB
+        wandb.log({
+            "learning_curve": lc_img,
+            "feature_importance": fi_img,
+            "mean_cv_f1": mean_cv_f1,
+            "mean_cv_auc": mean_cv_auc,
+            "overfit_gap": overfit_gap,
+            "test_f1": t_f1,
+            "test_auc": t_auc,
+            "test_accuracy": accuracy_score(y_test, y_pred),
+            "confusion_matrix": wandb.plot.confusion_matrix(
+                probs=None, y_true=y_test.values, preds=y_pred, class_names=["Normal", "Good"]
+            ),
+            "pr_curve": wandb.plot.pr_curve(
+                y_true=y_test.values, 
+                y_probas=pipeline.predict_proba(X_test),
+                labels=["Normal", "Good"]
+            ),
+        })
+
+        # Cập nhật Champion (Ưu tiên Healthy + F1 tốt nhất)
+        if "healthy" in status_tags and mean_cv_f1 > best_f1_cv:
+            best_f1_cv = mean_cv_f1
+            best_model_overall = pipeline
+            best_run_name = config["name"]
+            run.tags = run.tags + ("champion",)
+            print(f"⭐ New candidate champion: {best_run_name} (F1: {mean_cv_f1:.4f})")
+
+        # Lưu Artifact từng run
+        temp_path = f"temp_{config['name']}.joblib"
+        joblib.dump(pipeline, temp_path)
+        artifact = wandb.Artifact(config["name"], type="model")
+        artifact.add_file(temp_path)
+        run.log_artifact(artifact)
+        os.remove(temp_path)
+
+# ==========================================
+# 4. FINAL CHAMPION & REPORT
+# ==========================================
+if best_model_overall:
+    champion_path = "models/svm_model.joblib"
+    joblib.dump(best_model_overall, champion_path)
+    
+    with wandb.init(
+        entity="ngphuquy241-tr-ng-i-h-c-m-th-nh-ph-h-ch-minh",
+        project="Wine-Quality-Prediction",
+        name="svm_final_champion",
+        job_type="archive"
+    ) as final_run:
+        final_art = wandb.Artifact("svm-champion-model", type="model")
+        final_art.add_file(champion_path)
+        final_run.log_artifact(final_art)
+        final_run.log({"final_best_cv_f1": best_f1_cv})
+
+print("\n" + "=" * 105)
+print(f"{'BẢNG XẾP HẠNG SVM (ƯU TIÊN ĐỘ ỔN ĐỊNH - GAP THẤP)':^105}")
+print("=" * 105)
+
+# Sắp xếp theo Gap (thấp đến cao) rồi đến CV F1 (cao đến thấp)
+df_stability = pd.DataFrame(stability_history).sort_values(
+    by=["overfit_gap", "cv_f1"], 
+    ascending=[True, False]
+)
+
+print(df_stability.to_string(index=False))
+print("=" * 105)
+
+# wandb.finish()

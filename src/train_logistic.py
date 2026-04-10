@@ -1,7 +1,5 @@
 import os
 import joblib
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -196,7 +194,7 @@ for config in configs:
             param_grid,
             cv=kf,
             scoring=config["metric"],
-            n_jobs=-1,
+            
         )
         grid_search.fit(X_train, y_train)
         best_model = grid_search.best_estimator_
