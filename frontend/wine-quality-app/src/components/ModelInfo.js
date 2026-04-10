@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from "react"
-import {getModelInfo} from "../api/mockApi"
+import {getModelInfo} from "../api/Api"
 
 function ModelInfo(){
 
