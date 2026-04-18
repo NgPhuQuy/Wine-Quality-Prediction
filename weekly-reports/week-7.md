@@ -1,5 +1,5 @@
-# Báo cáo tuần 6
-**Tuần:** 6 (6/04/2026 - 12/04/2026)   
+# Báo cáo tuần 7
+**Tuần:** 7 (13/04/2026 - 19/04/2026)   
 **Nhóm:** 9 
 **Đề tài:** 7 - Wine Quality Prediction
 **Nhóm trưởng:** Nguyễn Phú Quý - 2351050147
@@ -19,24 +19,24 @@
 | EDA | Done | 100% | 
 | Preprocessing + Pipeline | Done | 100% | 
 | Modeling (≥3 models, wandb) | Done | 100% |  
-| Model Persistence | Đang làm | 50% | 
+| Model Persistence | Done | 100% | 
 | Frontend (ReactJS) | Done | 100% | 
 | Backend (API) | Done | 100% | 
-| Demo FE ↔ BE ↔ AI | Đang làm | 50% | 
-| Báo cáo | Chưa | ... | 
-**Tổng tiến độ:75%%** 
+| Demo FE ↔ BE ↔ AI | Done | 100% | 
+| Báo cáo | Đang làm | 90% | 
+**Tổng tiến độ : 97%%** 
 --- 
 ## 3. Kế hoạch tuần tới 
 | Thành viên | Công việc dự kiến | 
 |------------|-------------------| 
-|Nguyễn Phú Quý|Report| 
+|Nguyễn Phú Quý|Report, database| 
 |Đỗ Phước Vũ An|Report|
 |Phạm Thành Đạt|Report|
-|Nguyễn Hoàng Trúc Mai|Hoàn thiện Pineline, demo app(tiếp tục)|
+|Nguyễn Hoàng Trúc Mai|Hoàn thiện Pineline, demo app|
 
 --- 
 ## 4. Khó khăn / Cần hỗ trợ
 
 --- 
-*Ngày nộp: 12/4/2026*
+*Ngày nộp: 18/4/2026*
 *Xác nhận của Nhóm trưởng: Nguyễn Phú Quý*
