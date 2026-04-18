@@ -1,9 +1,17 @@
-import React from "react"
-import ReactDOM from "react-dom/client"
-import App from "./App"
+import React, { useState } from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import AuthPage from "./AuthPage";
 
-const root = ReactDOM.createRoot(document.getElementById("root"))
+function Root() {
+  const [isLogged, setIsLogged] = useState(false);
 
-root.render(
-<App/>
-)
+  return isLogged ? (
+    <App />
+  ) : (
+    <AuthPage onLogin={() => setIsLogged(true)} />
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<Root />);

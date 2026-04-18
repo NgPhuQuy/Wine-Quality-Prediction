@@ -44,7 +44,7 @@ function WineForm({ setResult, setLoading, setChartData }) {
     if (response && response.status === "success") {
       // Dùng raw_score (giả sử từ 0 -> 1) nhân cho 10 để ra thang điểm 10
       // Hoặc nếu BE trả về điểm chất lượng cụ thể, hãy dùng đúng số đó.
-      const calculatedScore = (response.raw_score * 10).toFixed(2); 
+      const calculatedScore = (response.raw_score * 100).toFixed(2); 
       setResult(calculatedScore); 
     }
   } catch (error) {
@@ -76,10 +76,10 @@ function WineForm({ setResult, setLoading, setChartData }) {
     <div className="wine-form-container">
       <div style={{ marginBottom: "25px", display: "flex", gap: "12px" }}>
         <button type="button" onClick={() => setWineType("red")} style={{ flex: 1, padding: "12px", borderRadius: "12px", background: wineType === "red" ? "#ef4444" : "#f1f5f9", color: wineType === "red" ? "white" : "#64748b", border: "none", fontWeight: "600", cursor: "pointer" }}>
-          🍷 Red Wine
+           Red Wine
         </button>
         <button type="button" onClick={() => setWineType("white")} style={{ flex: 1, padding: "12px", borderRadius: "12px", background: wineType === "white" ? "#38bdf8" : "#f1f5f9", color: wineType === "white" ? "white" : "#64748b", border: "none", fontWeight: "600", cursor: "pointer" }}>
-          🥂 White Wine
+           White Wine
         </button>
       </div>
 
