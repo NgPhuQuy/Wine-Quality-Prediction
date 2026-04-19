@@ -38,7 +38,7 @@ jupyter notebook notebooks/project_analysis.ipynb
 cd frontend\wine-quality-app && npm install && npm start 
 ### Truy cập
 - Frontend: http://localhost:3000
-- API: http://localhost:5000 (hoặc port tương ứng) 
+- API: http://localhost:8000 (hoặc port tương ứng) 
 ## Demo
 - wandb: [link]
 - Screenshot/video: [link hoặc mô tả] 

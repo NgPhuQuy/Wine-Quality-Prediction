@@ -23,14 +23,20 @@ export const predictWine = async (formData) => {
 
 
 export const getModelInfo = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        model: "RandomForestClassifier",
-        accuracy: "0.87",
-        features: 11,
-        description: "Predicts wine quality based on physicochemical properties."
-      });
-    }, 500);
-  });
+  try {
+    const res = await fetch("http://127.0.0.1:8000/model-info");
+
+    if (!res.ok) throw new Error("API error fetching model info");
+
+    const data = await res.json();
+
+    if (data.status === "success") {
+      return data; 
+    }
+    
+    throw new Error(data.message || "Invalid response");
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin mô hình:", error);
+    return null;
+  }
 };

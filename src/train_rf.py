@@ -4,6 +4,7 @@ import joblib
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 from metrics import evaluate_classification
 from Learning_Curve import plot_learning_curve
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
@@ -226,9 +227,20 @@ if best_model_overall:
     # Tạo thư mục models nếu chưa có
     os.makedirs("models", exist_ok=True)
     model_path = "models/rf_model.joblib"
+    metadata_path = "models/rf_metadata.joblib"
     
-    # 1. Lưu cục bộ
+    metadata_info = {
+        "model_name": "Random Forest",
+        "metrics":{
+            "best_f1_cv": round(best_f1_cv, 4),
+        },
+        "train_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "features": list(X.columns) if 'X' in locals() else "unknown"
+    }
+
+     # 1. Lưu cục bộ
     joblib.dump(best_model_overall, model_path)
+    joblib.dump(metadata_info, metadata_path)
     
     # 2. Lưu lên WandB Artifact
     # Khởi tạo lại run của champion để log artifact hoặc khởi tạo run mới chuyên dụng
@@ -238,7 +250,8 @@ if best_model_overall:
         id=best_run_id, 
         resume="must"
     ) as final_run:
-        artifact = wandb.Artifact(f"champion_model_{best_run_name}", type='model')
+        artifact = wandb.Artifact(f"champion_model_{best_run_name}", type='model', metadata=metadata_info)
         artifact.add_file(model_path)
+        artifact.add_file(metadata_path)
         final_run.log_artifact(artifact)
         print("Champion model artifact has been logged to WandB.")
