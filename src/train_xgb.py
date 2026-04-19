@@ -1,10 +1,14 @@
 import os
 import warnings
 import joblib
+import matplotlib
+matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import wandb
+
+from datetime import datetime
 from metrics import evaluate_classification
 from Learning_Curve import plot_learning_curve
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
@@ -147,15 +151,65 @@ for run_cfg in configs:
             run.tags = run.tags + ("champion",)
 
 if best_model_overall:
+    print("-" * 30)
+    print(f"FINAL SELECTION: {best_run_name} | Best CV F1: {best_f1_cv:.4f}")
+    print("-" * 30)
+
+  
     os.makedirs("models", exist_ok=True)
-    champion_path = "models/xgb_final_champion.joblib"
-    joblib.dump(best_model_overall, champion_path)
-    print(f"\n FINAL CHAMPION: {best_run_name} (CV F1: {best_f1_cv:.4f})")
-    print("\n" + "="*30)
+    pipeline_path = "models/xgb_model.joblib" 
+    metadata_path = "metadata/xgb_metadata.joblib"
+
+    metadata_info = {
+        "model_type": "XGBoost Classifier",
+        "version": "1.0.0",
+        "train_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "metrics": {
+            "best_cv_f1": round(best_f1_cv, 4),
+            "optimal_threshold": 0.55,
+            "status": "ready_for_backend"
+        },
+        "feature_engineering": [
+            "total_acidity", 
+            "sugar_alcohol_ratio", 
+            "density_alcohol_interaction"
+        ],
+        "best_run_name": best_run_name,
+        "features": list(X.columns)
+    }
+
+    # 3. Lưu cục bộ Full Pipeline (SMOTE + XGB) và Metadata bằng joblib
+    joblib.dump(best_model_overall, pipeline_path)
+    joblib.dump(metadata_info, metadata_path)
+    
+    # In báo cáo phân tích theo yêu cầu của Mai
+    print("\n" + "="*35)
     print("📊 MAI'S PIPELINE ANALYSIS REPORT")
-    print(f"1. Champion Model: {best_run_name}")
-    print(f"2. Best CV F1 Score: {best_f1_cv:.4f}")
-    print(f"3. Optimal Threshold: 0.55")
-    print("4. Feature Engineering: Added 'total_acidity', 'sugar_alcohol_ratio', 'density_alcohol_interaction'")
-    print("5. Status: Ready for Backend integration.")
-    print("="*30)
+    print(f"1. Champion Model: {metadata_info['best_run_name']}")
+    print(f"2. Best CV F1 Score: {metadata_info['metrics']['best_cv_f1']}")
+    print(f"3. Optimal Threshold: {metadata_info['metrics']['optimal_threshold']}")
+    print("4. Feature Engineering: Applied 3 new features")
+    print(f"5. Status: {metadata_info['metrics']['status']}")
+    print("="*35)
+
+    # 4. Lưu lên WandB Artifact
+    with wandb.init(
+        entity="ngphuquy241-tr-ng-i-h-c-m-th-nh-ph-h-ch-minh",
+        project="Wine-Quality-Prediction",
+        resume="allow"
+    ) as final_run:
+        
+        artifact = wandb.Artifact(
+            name=f"champion_pipeline_{best_run_name.replace(' ', '_')}", 
+            type="model_pipeline", 
+            metadata=metadata_info
+        )
+        
+        artifact.add_file(pipeline_path)
+        artifact.add_file(metadata_path)
+        
+        final_run.log_artifact(artifact)
+        final_run.log({"final_best_cv_f1": best_f1_cv})
+        print("\n✅ XGBoost Champion artifact has been logged to WandB.")
+else:
+    print("No healthy models met the minimum F1 threshold.")

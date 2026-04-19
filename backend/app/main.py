@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from backend.app.schemas.wine import WineInput 
-from backend.app.services.model import predict_wine
+from .services.predictService import predict_wine
+from .services.modelInfoService import get_model_metadata
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -17,6 +18,10 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"message": "Wine AI API running"}
+
+@app.get("/model-info")
+def get_info():
+    return get_model_metadata()
 
 @app.post("/predict")
 def predict(data: WineInput):

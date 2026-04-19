@@ -1,1 +1,1 @@
-MODEL_PATH = "models/wine_model.joblib"
+MODEL_PATH = "models/final_wine_model.joblib"
