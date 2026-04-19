@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import wandb
 
+from datetime import datetime
 from Learning_Curve import plot_learning_curve
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
@@ -335,14 +336,30 @@ if best_model_overall:
     print("-" * 30)
 
     champion_path = "models/logistic_model.joblib"
+    metadata_path = "metadata/logistic_metadata.joblib"
+
+    metadata_info = {
+        "model_type": "Logistic Regression",
+        "train_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "metrics": {
+            "best_cv_f1": round(best_f1_cv, 4)
+        },
+        "features": X.columns.tolist(), 
+        "best_run_name": best_run_name
+    }
+
+    os.makedirs("models", exist_ok=True)
     joblib.dump(best_model_overall, champion_path)
+
+    os.makedirs("metadata", exist_ok=True)
+    joblib.dump(best_model_overall, metadata_path)
 
     with wandb.init(
         project="Wine-Quality-Prediction",
         name="logistic_final_champion",
         job_type="archive",
     ) as final_run:
-        final_artifact = wandb.Artifact("champion-model", type="model")
+        final_artifact = wandb.Artifact("champion-model", type="model", metadata=metadata_info)
         final_artifact.add_file(champion_path)
         final_run.log_artifact(final_artifact)
         final_run.log({"final_best_cv_f1": best_f1_cv})

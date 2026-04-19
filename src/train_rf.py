@@ -227,7 +227,8 @@ if best_model_overall:
     # Tạo thư mục models nếu chưa có
     os.makedirs("models", exist_ok=True)
     model_path = "models/rf_model.joblib"
-    metadata_path = "models/rf_metadata.joblib"
+    os.makedirs("metadata", exist_ok=True)
+    metadata_path = "metadata/rf_metadata.joblib"
     
     metadata_info = {
         "model_name": "Random Forest",
@@ -235,7 +236,7 @@ if best_model_overall:
             "best_f1_cv": round(best_f1_cv, 4),
         },
         "train_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "features": list(X.columns) if 'X' in locals() else "unknown"
+        "features": list(X.columns).tolist()
     }
 
      # 1. Lưu cục bộ

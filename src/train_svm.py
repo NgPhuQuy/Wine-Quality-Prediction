@@ -6,6 +6,7 @@ import pandas as pd
 import wandb
 import matplotlib
 matplotlib.use('Agg') 
+from datetime import datetime
 from Learning_Curve import plot_learning_curve
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
@@ -218,31 +219,70 @@ for config in configs:
 # 4. FINAL CHAMPION & REPORT
 # ==========================================
 if best_model_overall:
-    champion_path = "models/svm_model.joblib"
-    joblib.dump(best_model_overall, champion_path)
-    
+    print("-" * 30)
+    print(f"FINAL SELECTION: {best_run_name} | Best CV F1: {best_f1_cv:.4f}")
+    print("-" * 30)
+
+    # 1. Cấu hình đường dẫn cho SVM
+    os.makedirs("models", exist_ok=True)
+    pipeline_path = "models/svm_model.joblib" 
+    metadata_path = "metadata/svm_metadata.joblib"
+
+    # 2. Metadata chi tiết (Đúng yêu cầu: metrics, date, version)
+    metadata_info = {
+        "model_type": "Support Vector Machine (SVM)",
+        "version": "1.0.0",
+        "train_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "metrics": {
+            "best_cv_f1": round(best_f1_cv, 4),
+            "status": "healthy"
+        },
+        "best_run_name": best_run_name,
+        "features": X.columns.tolist()
+    }
+
+    # 3. Lưu cục bộ Full Pipeline (SMOTE + SVM) và Metadata bằng joblib
+    joblib.dump(best_model_overall, pipeline_path)
+    joblib.dump(metadata_info, metadata_path)
+    print(f"Saved SVM Full Pipeline and Metadata to {pipeline_path}")
+
+    # 4. Lưu lên WandB Artifact
+    # Lưu ý: id=best_run_id giúp lưu model vào đúng Run tốt nhất bạn đã thực hiện
     with wandb.init(
         entity="ngphuquy241-tr-ng-i-h-c-m-th-nh-ph-h-ch-minh",
         project="Wine-Quality-Prediction",
-        name="svm_final_champion",
-        job_type="archive"
+        resume="allow"
     ) as final_run:
-        final_art = wandb.Artifact("svm-champion-model", type="model")
-        final_art.add_file(champion_path)
-        final_run.log_artifact(final_art)
+        
+        artifact = wandb.Artifact(
+            name=f"champion_pipeline_{best_run_name.replace(' ', '_')}", 
+            type="model_pipeline", 
+            metadata=metadata_info
+        )
+        
+        artifact.add_file(pipeline_path)
+        artifact.add_file(metadata_path)
+        
+        final_run.log_artifact(artifact)
         final_run.log({"final_best_cv_f1": best_f1_cv})
+        print("SVM Champion artifact has been logged to WandB.")
+else:
+    print("No healthy models met the minimum F1 threshold.")
 
+# ==========================================
+# 5. BẢNG XẾP HẠNG
+# ==========================================
 print("\n" + "=" * 105)
 print(f"{'BẢNG XẾP HẠNG SVM (ƯU TIÊN ĐỘ ỔN ĐỊNH - GAP THẤP)':^105}")
 print("=" * 105)
 
 # Sắp xếp theo Gap (thấp đến cao) rồi đến CV F1 (cao đến thấp)
-df_stability = pd.DataFrame(stability_history).sort_values(
-    by=["overfit_gap", "cv_f1"], 
-    ascending=[True, False]
-)
-
-print(df_stability.to_string(index=False))
+if not stability_history:
+    print("No history recorded.")
+else:
+    df_stability = pd.DataFrame(stability_history).sort_values(
+        by=["overfit_gap", "cv_f1"], 
+        ascending=[True, False]
+    )
+    print(df_stability.to_string(index=False))
 print("=" * 105)
-
-# wandb.finish()

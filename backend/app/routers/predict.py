@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from schemas.wine import WineInput
-from services.model import predict_wine
+from services.predictService import predict_wine
 
 router = APIRouter(prefix="/predict", tags=["Predict"])
 
