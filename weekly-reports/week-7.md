@@ -29,10 +29,10 @@
 ## 3. Kế hoạch tuần tới 
 | Thành viên | Công việc dự kiến | 
 |------------|-------------------| 
-|Nguyễn Phú Quý|Report, database| 
-|Đỗ Phước Vũ An|Report|
-|Phạm Thành Đạt|Report|
-|Nguyễn Hoàng Trúc Mai|Hoàn thiện Pineline, demo app|
+|Nguyễn Phú Quý|Hoàn thiện project tuần cuối| 
+|Đỗ Phước Vũ An|Hoàn thiện project tuần cuối|
+|Phạm Thành Đạt|Hoàn thiện project tuần cuối|
+|Nguyễn Hoàng Trúc Mai|Hoàn thiện project tuần cuối|
 
 --- 
 ## 4. Khó khăn / Cần hỗ trợ

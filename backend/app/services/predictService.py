@@ -9,32 +9,29 @@ def predict_wine(data):
         else:
             data = data
 
-        # Lấy giá trị và xử lý lỗi tên biến có/không có gạch dưới
-        f_acid = float(data.get("fixed_acidity") or data.get("fixed acidity") or 0)
-        v_acid = float(data.get("volatile_acidity") or data.get("volatile acidity") or 0)
-        res_sugar = float(data.get("residual_sugar") or data.get("residual sugar") or 0)
-        alc = float(data.get("alcohol") or 0)
-        dens = float(data.get("density") or 0)
+        f_acid = float(data.get("fixed_acidity"))
+        v_acid = float(data.get("volatile_acidity"))
+        res_sugar = float(data.get("residual_sugar"))
+        alc = float(data.get("alcohol"))
+        dens = float(data.get("density"))
         
-        # Feature Engineering (giữ nguyên logic của bạn)
         total_acidity = f_acid + v_acid
         sugar_alcohol_ratio = res_sugar / (alc + 1e-5)
         density_alcohol_interaction = dens * alc
 
-        # TẠO DICT VỚI KEY CÓ KHOẢNG TRẮNG (Để khớp với COLUMNS)
         input_dict = {
             'fixed acidity': f_acid,
             'volatile acidity': v_acid,
-            'citric acid': float(data.get("citric_acid") or data.get("citric acid") or 0),
+            'citric acid': float(data.get("citric_acid")),
             'residual sugar': res_sugar,
-            'chlorides': float(data.get("chlorides") or 0),
-            'free sulfur dioxide': float(data.get("free_sulfur_dioxide") or data.get("free sulfur dioxide") or 0),
-            'total sulfur dioxide': float(data.get("total_sulfur_dioxide") or data.get("total sulfur dioxide") or 0),
+            'chlorides': float(data.get("chlorides")),
+            'free sulfur dioxide': float(data.get("free_sulfur_dioxide")),
+            'total sulfur dioxide': float(data.get("total_sulfur_dioxide")),
             'density': dens,
-            'pH': float(data.get("pH") or 0),
-            'sulphates': float(data.get("sulphates") or 0),
+            'pH': float(data.get("pH")),
+            'sulphates': float(data.get("sulphates")),
             'alcohol': alc,
-            'type': 0 if str(data.get("type", "red")).lower() == "red" else 1,
+            'type': int(data.get("type")),
             'total_acidity': total_acidity,
             'sugar_alcohol_ratio': sugar_alcohol_ratio,
             'density_alcohol_interaction': density_alcohol_interaction

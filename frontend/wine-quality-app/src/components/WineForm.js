@@ -20,7 +20,9 @@ function WineForm({ setResult, setLoading, setChartData }) {
 
   const getDefaultForm = () => {
     const obj = {};
-    Object.keys(ranges).forEach((key) => { obj[key] = 0; });
+    Object.keys(ranges).forEach((key) => { 
+      obj[key] = ranges[key][0]; 
+    });
     return obj;
   };
 
@@ -34,26 +36,34 @@ function WineForm({ setResult, setLoading, setChartData }) {
     }));
   };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setChartData(form);
-  
-  try {
-    const response = await predictWine(form);
-    if (response && response.status === "success") {
-      // Dùng raw_score (giả sử từ 0 -> 1) nhân cho 10 để ra thang điểm 10
-      // Hoặc nếu BE trả về điểm chất lượng cụ thể, hãy dùng đúng số đó.
-      const calculatedScore = (response.raw_score * 100).toFixed(2); 
-      setResult(calculatedScore); 
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const payload = {
+      ...form,
+      type: wineType === "red" ? 0 : 1
+    };
+
+    setChartData(payload);
+
+    try {
+      const response = await predictWine(payload);
+      
+      if (response && response.status === "success") {
+        // const calculatedScore = (response.raw_score * 100).toFixed(2);
+        // setResult(calculatedScore);
+        setResult(response);
+      } else {
+        alert("Model error: " + (response?.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Lỗi kết nối API:", error);
+      alert("Cannot connect to API server!");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Lỗi chi tiết:", error);
-    alert("API server connection error!");
-  } finally { 
-    setLoading(false); 
-  }
-};
+  };
 
   // Định nghĩa style cho nút + và -
   const btnStyle = {
@@ -76,10 +86,10 @@ function WineForm({ setResult, setLoading, setChartData }) {
     <div className="wine-form-container">
       <div style={{ marginBottom: "25px", display: "flex", gap: "12px" }}>
         <button type="button" onClick={() => setWineType("red")} style={{ flex: 1, padding: "12px", borderRadius: "12px", background: wineType === "red" ? "#ef4444" : "#f1f5f9", color: wineType === "red" ? "white" : "#64748b", border: "none", fontWeight: "600", cursor: "pointer" }}>
-           Red Wine
+          Red Wine
         </button>
         <button type="button" onClick={() => setWineType("white")} style={{ flex: 1, padding: "12px", borderRadius: "12px", background: wineType === "white" ? "#38bdf8" : "#f1f5f9", color: wineType === "white" ? "white" : "#64748b", border: "none", fontWeight: "600", cursor: "pointer" }}>
-           White Wine
+          White Wine
         </button>
       </div>
 
@@ -108,24 +118,24 @@ function WineForm({ setResult, setLoading, setChartData }) {
                     onMouseOut={(e) => e.target.style.background = "white"}
                   > - </button>
 
-<input
-  type="range"
-  min={min}
-  max={max}
-  step="0.001"
-  value={value}
-  onChange={(e) => handleChange(key, e.target.value)}
-  style={{
-    flex: 1,
-    background: `linear-gradient(
+                  <input
+                    type="range"
+                    min={min}
+                    max={max}
+                    step="0.001"
+                    value={value}
+                    onChange={(e) => handleChange(key, e.target.value)}
+                    style={{
+                      flex: 1,
+                      background: `linear-gradient(
       90deg,
       ${color} 0%,
       ${color} ${percent}%,
       #e2e8f0 ${percent}%,
       #e2e8f0 100%
     )`
-  }}
-/>  
+                    }}
+                  />
 
                   {/* Nút + */}
                   <button

@@ -1,9 +1,9 @@
 import joblib
-from ..core.config import MODEL_PATH
+from ..core.config import MODEL_PATH, METADATA_PATH
 
 # 1. Load model
 model = joblib.load(MODEL_PATH)
-
+metadata = joblib.load(METADATA_PATH)
 
 # 2. ĐỊNH NGHĨA TÊN CỘT
 COLUMNS = [
@@ -12,6 +12,3 @@ COLUMNS = [
     'pH', 'sulphates', 'alcohol', 'type', 
     'total_acidity', 'sugar_alcohol_ratio', 'density_alcohol_interaction'
 ]
-
-if __name__ == "__main__":
-    print(model.__class__.__name__)

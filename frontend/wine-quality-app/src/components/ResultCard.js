@@ -3,10 +3,9 @@ import React from "react";
 function ResultCard({ result }) {
   if (result === null || result === undefined) return null;
 
-  const percent = Number(result);
-
-  // 🔥 logic mới
-  const isGood = percent > 70;
+  const isGood = result.is_good_wine;
+  const confidence = result.raw_score || 0;
+  const percent = Math.round(confidence * 100);
 
   const color = isGood ? "#10b981" : "#64748b";
 
@@ -45,7 +44,7 @@ function ResultCard({ result }) {
 
       {/*  Nhận xét */}
       <h2 style={{ color: color }}>
-        {isGood ? "✔ Good Wine " : "Normal Wine"}
+        {isGood ? "Good Wine " : "Normal Wine"}
       </h2>
 
       {/*  Mô tả */}
