@@ -1,16 +1,37 @@
 from pydantic import BaseModel, Field
-from typing import Literal
+from typing import List, Optional
+from datetime import datetime
+from enum import IntEnum
 
-class WineInput(BaseModel):
-    fixed_acidity: float = Field(..., ge=0, example=7.4, description="Fixed acidity (g/dm³)")
-    volatile_acidity: float = Field(..., ge=0, example=0.7, description="Volatile acidity (g/dm³)")
-    citric_acid: float = Field(..., ge=0, example=0.0, description="Citric acid (g/dm³)")
-    residual_sugar: float = Field(..., ge=0, example=1.9, description="Residual sugar (g/dm³)")
-    chlorides: float = Field(..., ge=0, example=0.076, description="Chlorides (g/dm³)")
-    free_sulfur_dioxide: float = Field(..., ge=0, example=11.0, description="Free sulfur dioxide (mg/dm³)")
-    total_sulfur_dioxide: float = Field(..., ge=0, example=34.0, description="Total sulfur dioxide (mg/dm³)")
-    density: float = Field(..., ge=0, example=0.9978, description="Density (g/cm³)")
-    pH: float = Field(..., ge=0, le=14, example=3.51, description="pH value (0–14)")
-    sulphates: float = Field(..., ge=0, example=0.56, description="Sulphates (g/dm³)")
-    alcohol: float = Field(..., ge=0, example=9.4, description="Alcohol (% by volume)")
-    type: int = Field(default=0, ge=0, le=1, description="Wine type (0 for Red, 1 for White)",example=0)
+# 1. Định nghĩa loại rượu cho rõ ràng
+class WineType(IntEnum):
+    RED = 0
+    WHITE = 1
+
+# 2. Schema cơ sở (Chứa các thông số hóa học)
+class WineBase(BaseModel):
+    fixed_acidity: float = Field(..., ge=0, json_schema_extra={"example": 7.4})
+    volatile_acidity: float = Field(..., ge=0, json_schema_extra={"example": 0.7})
+    citric_acid: float = Field(..., ge=0, json_schema_extra={"example": 0.0})
+    residual_sugar: float = Field(..., ge=0, json_schema_extra={"example": 1.9})
+    chlorides: float = Field(..., ge=0, json_schema_extra={"example": 0.076})
+    free_sulfur_dioxide: float = Field(..., ge=0, json_schema_extra={"example": 11.0})
+    total_sulfur_dioxide: float = Field(..., ge=0, json_schema_extra={"example": 34.0})
+    density: float = Field(..., ge=0, json_schema_extra={"example": 0.9978})
+    ph: float = Field(..., ge=0, le=14, json_schema_extra={"example": 3.51}) # Đổi pH thành ph
+    sulphates: float = Field(..., ge=0, json_schema_extra={"example": 0.56})
+    alcohol: float = Field(..., ge=0, json_schema_extra={"example": 9.4})
+    wine_type: WineType = Field(default=WineType.RED, description="0: Red, 1: White")
+
+# 3. Schema dùng khi Frontend gửi dữ liệu lên dự đoán
+class WineCreate(WineBase):
+    user_id: int
+
+# 4. Schema dùng khi trả kết quả về (Có thêm ID và Điểm số từ AI)
+class WineResponse(WineBase):
+    id: int
+    quality_score: int = Field(..., description="Dự đoán từ Model AI")
+    created_at: datetime
+
+    class Config:
+        from_attributes = True # Quan trọng: Để biến đổi từ SQLAlchemy sang Pydantic

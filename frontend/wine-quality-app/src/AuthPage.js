@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { registerUser, loginUser } from "./api/Api";
 function AuthPage({ onLogin }) {
   const [isRegister, setIsRegister] = useState(true);
 
@@ -17,25 +17,35 @@ function AuthPage({ onLogin }) {
     });
   };
 
-  const handleSubmit = () => {
-    if (isRegister) {
-      localStorage.setItem("user", JSON.stringify(form));
-      alert("Register success!");
+ const handleSubmit = async () => {
+  if (isRegister) {
+    const data = await registerUser(form);
+    if (data && !data.detail) {
+      alert("Đăng ký thành công!");
       setIsRegister(false);
     } else {
-      const saved = JSON.parse(localStorage.getItem("user"));
-
-      if (
-        saved &&
-        form.username === saved.username &&
-        form.password === saved.password
-      ) {
-        onLogin();
-      } else {
-        alert("Wrong username or password!");
-      }
+      alert("Lỗi đăng ký!");
     }
-  };
+  } else {
+    // ĐĂNG NHẬP
+    const data = await loginUser({
+      username: form.username,
+      password: form.password
+    });
+
+    
+    if (data && data.message === "Đăng nhập thành công") {
+      alert(data.username + "đăng nhập thành công!");
+      
+
+      localStorage.setItem("user_logged", data.username); 
+      
+      onLogin(); // Cho vào trang Dashboard ngay và luôn
+    } else {
+      alert("Sai tài khoản hoặc mật khẩu ");
+    }
+  }
+};
 
   return (
     <div className="auth-container">
