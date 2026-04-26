@@ -10,7 +10,7 @@ router = APIRouter(prefix="/predict", tags=["Prediction"])
 
 # CHỈ GIỮ LẠI MỘT HÀM POST DUY NHẤT: Vừa dự đoán, vừa lưu
 @router.post("/", response_model=WineResponse)
-def predict_and_save(
+def predict(
     payload: WineCreate, 
     db: Session = Depends(get_db)
     # BƯỚC 1: XÓA DÒNG current_user: User = Depends(get_current_user)
