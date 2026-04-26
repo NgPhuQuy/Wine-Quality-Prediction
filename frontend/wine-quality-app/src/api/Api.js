@@ -40,3 +40,32 @@ export const getModelInfo = async () => {
     return null;
   }
 };
+// Thêm hàm Đăng ký
+export const registerUser = async (userData) => {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+    return await res.json();
+  } catch (error) {
+    console.error("Lỗi đăng ký:", error);
+    return null;
+  }
+};
+
+// Thêm hàm Đăng nhập
+export const loginUser = async (loginData) => {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loginData),
+    });
+    return await res.json();
+  } catch (error) {
+    console.error("Lỗi đăng nhập:", error);
+    return null;
+  }
+};
