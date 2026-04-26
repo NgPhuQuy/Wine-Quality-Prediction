@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { registerUser, loginUser } from "./api/Api";
+
 function AuthPage({ onLogin }) {
   const [isRegister, setIsRegister] = useState(true);
+  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     email: "",
@@ -11,55 +13,58 @@ function AuthPage({ onLogin }) {
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError(""); // xóa lỗi khi user gõ lại
   };
 
- const handleSubmit = async () => {
-  if (isRegister) {
-    const data = await registerUser(form);
-    if (data && !data.detail) {
-      alert("Đăng ký thành công!");
-      setIsRegister(false);
-    } else {
-      alert("Lỗi đăng ký!");
-    }
-  } else {
-    // ĐĂNG NHẬP
-    const data = await loginUser({
-      username: form.username,
-      password: form.password
-    });
+  const handleSubmit = async () => {
+    setError("");
 
-    
-    if (data && data.message === "Đăng nhập thành công") {
-      alert(data.username + " đăng nhập thành công!");  // FIX: thêm space trước "đăng nhập"
-      localStorage.setItem("user_id", data.user_id);
-      localStorage.setItem("username", data.username);
-      // FIX: bỏ localStorage.removeItem("user_logged") - key này không dùng ở đâu, gây nhầm lẫn
+    if (isRegister) {
+      // ── ĐĂNG KÝ ──────────────────────────────
+      const result = await registerUser(form);
+      if (result.success) {
+        alert("Đăng ký thành công!");
+        setIsRegister(false);
+      } else {
+        setError(result.message || "Lỗi đăng ký!");
+      }
 
-      onLogin(); // Cho vào trang Dashboard ngay và luôn
     } else {
-      alert("Sai tài khoản hoặc mật khẩu ");
+      // ── ĐĂNG NHẬP ────────────────────────────
+      const result = await loginUser({
+        username: form.username,
+        password: form.password
+      });
+
+      if (result.success) {
+        onLogin(result.data); // báo App.js là đã đăng nhập thành công
+      } else {
+        setError(result.message || "Sai tài khoản hoặc mật khẩu!");
+      }
     }
-  }
-};
+  };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
 
         <div className="auth-header">
-        <h1 className="logo-text">
-    <span className="logo-light">Wine</span>
-    <span className="logo-accent">AI</span>
-  </h1>
+          <h1 className="logo-text">
+            <span className="logo-light">Wine</span>
+            <span className="logo-accent">AI</span>
+          </h1>
           <p className="intro">
             Sign in to access intelligent wine quality analysis powered by machine learning
           </p>
         </div>
+
+        {/* Thông báo lỗi */}
+        {error && (
+          <p style={{ color: "var(--color-text-danger)", fontSize: "13px", margin: "0 0 10px" }}>
+            {error}
+          </p>
+        )}
 
         {isRegister && (
           <>
@@ -81,7 +86,6 @@ function AuthPage({ onLogin }) {
           placeholder="Username"
           onChange={handleChange}
         />
-
         <input
           name="password"
           type="password"
@@ -95,7 +99,7 @@ function AuthPage({ onLogin }) {
 
         <p className="switch">
           {isRegister ? "Already have an account?" : "Don't have an account?"}
-          <span onClick={() => setIsRegister(!isRegister)}>
+          <span onClick={() => { setIsRegister(!isRegister); setError(""); }}>
             {isRegister ? " Sign in" : " Register"}
           </span>
         </p>

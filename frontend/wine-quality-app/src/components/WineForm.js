@@ -42,15 +42,16 @@ const handleSubmit = async (e) => {
 
     const payload = {
       ...form,
-      wine_type: wineType === "red" ? 0 : 1  // FIX: đổi "type" → "wine_type" để khớp với WineCreate schema
+      wine_type: wineType === "red" ? 0 : 1 
     };
 
     setChartData(payload);
 
     try {
       const response = await predictWine(payload);
+      console.log("=== RESPONSE ===", response)
       
-      if (response && response.status === "success") {
+      if (response && response.success === true) {
         // const calculatedScore = (response.raw_score * 100).toFixed(2);
         // setResult(calculatedScore);
         setResult(response);

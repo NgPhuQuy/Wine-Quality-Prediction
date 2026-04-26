@@ -20,21 +20,21 @@ def predict_and_store_wine(db: Session, data: WineCreate, user_id: int):
         density_alcohol_interaction = dens * alc
 
         input_dict = {
-            'fixed acidity':              f_acid,
-            'volatile acidity':           v_acid,
-            'citric acid':                float(input_data.get("citric_acid", 0)),
-            'residual sugar':             res_sugar,
-            'chlorides':                  float(input_data.get("chlorides", 0)),
-            'free sulfur dioxide':        float(input_data.get("free_sulfur_dioxide", 0)),
-            'total sulfur dioxide':       float(input_data.get("total_sulfur_dioxide", 0)),
-            'density':                    dens,
-            'ph':                         float(input_data.get("ph", 0)),
-            'sulphates':                  float(input_data.get("sulphates", 0)),
-            'alcohol':                    alc,
-            'type':                       int(input_data.get("wine_type", 0)),
-            'total_acidity':              total_acidity,
-            'sugar_alcohol_ratio':        sugar_alcohol_ratio,
-            'density_alcohol_interaction': density_alcohol_interaction,
+            'fixed acidity': f_acid,
+            'volatile acidity': v_acid,
+            'citric acid': float(input_data.get("citric_acid", 0)),
+            'residual sugar': res_sugar,
+            'chlorides': float(input_data.get("chlorides", 0)),
+            'free sulfur dioxide': float(input_data.get("free_sulfur_dioxide", 0)),
+            'total sulfur dioxide': float(input_data.get("total_sulfur_dioxide", 0)),
+            'density': dens,
+            'pH': float(input_data.get("ph", 0)), # Chú ý: ph (schema) -> pH (model)
+            'sulphates': float(input_data.get("sulphates", 0)),
+            'alcohol': alc,
+            'type': int(input_data.get("wine_type", 0)), # wine_type (schema) -> type (model)
+            'total_acidity': total_acidity,
+            'sugar_alcohol_ratio': sugar_alcohol_ratio,
+            'density_alcohol_interaction': density_alcohol_interaction
         }
 
         df = pd.DataFrame([input_dict])[COLUMNS]

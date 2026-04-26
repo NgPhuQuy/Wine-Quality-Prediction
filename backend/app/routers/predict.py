@@ -15,15 +15,18 @@ def predict_wine(  # FIX: đổi tên từ "predict" thành "predict_wine" để
     db: Session = Depends(get_db)
 ):
     result = predictService.predict_and_store_wine(db, payload, payload.user_id)
-
+    print("=== RESULT ===", result) 
     if result["status"] == "error":
         raise HTTPException(status_code=500, detail=result["message"])
 
     return {
-        **payload.model_dump(),
-        "id": result["id"],
-        "quality_score": result["quality_score"],
-        "created_at": result["created_at"]
+    **payload.model_dump(),
+    "id": result["id"],
+    "quality_score": result["quality_score"],
+    "created_at": result["created_at"],
+    "status": "success",           # thêm dòng này
+    "quality_label": result["quality_label"],  # thêm dòng này
+    "raw_score": result["raw_score"]
     }
 
 

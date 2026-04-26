@@ -28,6 +28,6 @@ else:
 COLUMNS = [
     'fixed acidity', 'volatile acidity', 'citric acid', 'residual sugar',
     'chlorides', 'free sulfur dioxide', 'total sulfur dioxide', 'density',
-    'ph', 'sulphates', 'alcohol', 'type',
+    'pH', 'sulphates', 'alcohol', 'type', 
     'total_acidity', 'sugar_alcohol_ratio', 'density_alcohol_interaction'
 ]  # FIX: dấu ] bị thiếu trong file gốc
