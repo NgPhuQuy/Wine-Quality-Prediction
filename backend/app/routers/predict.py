@@ -1,27 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..schemas.wine import WineCreate, WineResponse
-from ..services import predictService  
+from ..services import predictService
 from ..core.database import get_db
-from ..routers import predict
-from ..models.user import User
+# FIX: Bỏ "from ..routers import predict" - đây là self-import gây circular import
+# FIX: Bỏ "from ..models.user import User" - không dùng
 
 router = APIRouter(prefix="/predict", tags=["Prediction"])
 
-# CHỈ GIỮ LẠI MỘT HÀM POST DUY NHẤT: Vừa dự đoán, vừa lưu
+
 @router.post("/", response_model=WineResponse)
-def predict(
-    payload: WineCreate, 
+def predict_wine(  # FIX: đổi tên từ "predict" thành "predict_wine" để không đụng tên với module
+    payload: WineCreate,
     db: Session = Depends(get_db)
-    # BƯỚC 1: XÓA DÒNG current_user: User = Depends(get_current_user)
 ):
-    # BƯỚC 2: Lấy user_id trực tiếp từ payload thay vì từ current_user
     result = predictService.predict_and_store_wine(db, payload, payload.user_id)
     print("=== RESULT ===", result) 
     if result["status"] == "error":
         raise HTTPException(status_code=500, detail=result["message"])
-        
-    # BƯỚC 3: Trả về kết quả (Vẫn giữ logic cũ nhưng dùng payload.model_dump)
+
     return {
     **payload.model_dump(),
     "id": result["id"],
@@ -31,12 +28,11 @@ def predict(
     "quality_label": result["quality_label"],  # thêm dòng này
     "raw_score": result["raw_score"]
     }
-# API LẤY LỊCH SỬ
+
+
 @router.get("/history", response_model=list[WineResponse])
-def get_user_history(
+def get_user_history(  # FIX: thêm thụt lề đúng (trước đây body nằm ngoài hàm)
     user_id: int,
-    db: Session = Depends(get_db), 
-   
+    db: Session = Depends(get_db)
 ):
-    
     return predictService.get_history_by_user(db, user_id)
