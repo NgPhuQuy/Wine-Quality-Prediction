@@ -4,22 +4,24 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# 1. Nạp các biến từ file .env vào hệ thống
 load_dotenv()
 
-# 2. Lấy URL từ biến môi trường (tên biến phải khớp với trong file .env)
-# Nếu không tìm thấy, nó sẽ mặc định dùng chuỗi rỗng để tránh crash ngay lập tức
 URL = os.getenv("DB_URL")
 
-engine = create_engine(URL)
+# FIX: Thêm kiểm tra URL trước khi tạo engine, tránh lỗi khó debug
+if not URL:
+    raise ValueError(
+        "Biến môi trường DB_URL chưa được cấu hình. "
+        "Hãy copy file .env.example thành .env và điền thông tin database."
+    )
 
-# Các phần dưới giữ nguyên
+engine = create_engine(URL)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
 
 def get_db():
     db = SessionLocal()
-    try: 
+    try:
         yield db
-    finally: 
+    finally:
         db.close()
