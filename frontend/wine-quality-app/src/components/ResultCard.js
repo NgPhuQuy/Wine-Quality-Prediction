@@ -2,13 +2,13 @@ import React from "react";
 
 function ResultCard({ result }) {
   if (result === null || result === undefined) return null;
-
+  
   const isGood = result.is_good_wine;
-  const confidence = result.raw_score || 0;
+  const confidence = result.data?.raw_score || 0;
   const percent = Math.round(confidence * 100);
 
   const color = isGood ? "#10b981" : "#64748b";
-
+  
   return (
     <div className="result-card luxury" style={{ textAlign: "center", padding: "20px" }}>
       

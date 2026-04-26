@@ -32,6 +32,8 @@ class WineResponse(WineBase):
     id: int
     quality_score: int = Field(..., description="Dự đoán từ Model AI")
     created_at: datetime
-
+    status: Optional[str] = None        # thêm
+    quality_label: Optional[str] = None # thêm
+    raw_score: Optional[float] = None 
     class Config:
         from_attributes = True # Quan trọng: Để biến đổi từ SQLAlchemy sang Pydantic

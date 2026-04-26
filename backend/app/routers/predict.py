@@ -17,16 +17,19 @@ def predict(
 ):
     # BƯỚC 2: Lấy user_id trực tiếp từ payload thay vì từ current_user
     result = predictService.predict_and_store_wine(db, payload, payload.user_id)
-    
+    print("=== RESULT ===", result) 
     if result["status"] == "error":
         raise HTTPException(status_code=500, detail=result["message"])
         
     # BƯỚC 3: Trả về kết quả (Vẫn giữ logic cũ nhưng dùng payload.model_dump)
     return {
-        **payload.model_dump(), 
-        "id": result["id"],
-        "quality_score": result["quality_score"], # Dùng điểm thật từ AI trả về
-        "created_at": result["created_at"]
+    **payload.model_dump(),
+    "id": result["id"],
+    "quality_score": result["quality_score"],
+    "created_at": result["created_at"],
+    "status": "success",           # thêm dòng này
+    "quality_label": result["quality_label"],  # thêm dòng này
+    "raw_score": result["raw_score"]
     }
 # API LẤY LỊCH SỬ
 @router.get("/history", response_model=list[WineResponse])

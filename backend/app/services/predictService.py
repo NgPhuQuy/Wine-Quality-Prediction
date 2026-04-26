@@ -31,7 +31,7 @@ def predict_and_store_wine(db: Session, data: WineCreate, user_id: int):
             'free sulfur dioxide': float(input_data.get("free_sulfur_dioxide", 0)),
             'total sulfur dioxide': float(input_data.get("total_sulfur_dioxide", 0)),
             'density': dens,
-            'ph': float(input_data.get("ph", 0)), # Chú ý: ph (schema) -> pH (model)
+            'pH': float(input_data.get("ph", 0)), # Chú ý: ph (schema) -> pH (model)
             'sulphates': float(input_data.get("sulphates", 0)),
             'alcohol': alc,
             'type': int(input_data.get("wine_type", 0)), # wine_type (schema) -> type (model)
