@@ -33,7 +33,7 @@ jupyter notebook notebooks/project_analysis.ipynb
 ### Chạy Backend 
 - cài đặt môi trường: .venv\Scripts\activate
 - tải các thư viện: pip install -r requirements.txt
-- chạy lệnh:  uvicorn backend.app.main:app --reload
+- chạy lệnh: uvicorn backend.app.main:app --reload
 ### Chạy Frontend 
 cd frontend\wine-quality-app && npm install && npm start 
 ### Truy cập

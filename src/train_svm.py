@@ -64,21 +64,8 @@ configs = [
     {
         "name": "svm_v2_run4", 
         "kernel": "rbf", "C": 1.0, "smote": True, "threshold": 0.5   # Cải tiến Run 3: Hạ threshold để Recall > 0.7
-    },
-    {
-        "name": "svm_v2_run5", 
-        "kernel": "rbf", "C": 5.0, "smote": True, "threshold": 0.55  # Kết hợp sức mạnh Run 3 và độ gắt của Run 7
-    },
-
-    # --- NHÓM 3: TÌM ĐIỂM CÂN BẰNG MỚI (Hybrid) ---
-    {
-        "name": "svm_v2_run6", 
-        "kernel": "rbf", "C": 50.0, "smote": True, "threshold": 0.6   # Mức C trung gian, threshold an toàn
-    },
-    {
-        "name": "svm_v2_run7", 
-        "kernel": "rbf", "C": 20.0, "smote": True, "threshold": 0.5   # Low threshold với C vừa phải
-    },
+    }
+    
 ]
 
 MAX_OVERFIT_GAP = 0.1
