@@ -25,7 +25,7 @@ class WineBase(BaseModel):
 
 # 3. Schema dùng khi Frontend gửi dữ liệu lên dự đoán
 class WineCreate(WineBase):
-    pass
+    user_id: int
 
 # 4. Schema dùng khi trả kết quả về (Có thêm ID và Điểm số từ AI)
 class WineResponse(WineBase):

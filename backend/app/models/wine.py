@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, DateTime
 from sqlalchemy.sql import func
-from app.core.database import Base
+from ..core.database import Base
 
 class WinePrediction(Base):
     __tablename__ = "wine_predictions"

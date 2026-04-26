@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.wine import WineCreate, WineResponse
-from app.services import predictService  
-from app.core.database import get_db
-from app.routers.auth import get_current_user 
-from app.models.user import User
+from ..schemas.wine import WineCreate, WineResponse
+from ..services import predictService  
+from ..core.database import get_db
+from ..routers import predict
+from ..models.user import User
 
 router = APIRouter(prefix="/predict", tags=["Prediction"])
 
@@ -12,28 +12,27 @@ router = APIRouter(prefix="/predict", tags=["Prediction"])
 @router.post("/", response_model=WineResponse)
 def predict_and_save(
     payload: WineCreate, 
-    db: Session = Depends(get_db), 
-    current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db)
+    # BƯỚC 1: XÓA DÒNG current_user: User = Depends(get_current_user)
 ):
-    # Gọi hàm "tất cả trong một" ở Service mà mình vừa sửa cho Quý
-    result = predictService.predict_and_store_wine(db, payload, current_user.id)
+    # BƯỚC 2: Lấy user_id trực tiếp từ payload thay vì từ current_user
+    result = predictService.predict_and_store_wine(db, payload, payload.user_id)
     
     if result["status"] == "error":
         raise HTTPException(status_code=500, detail=result["message"])
         
-    # Trả về dữ liệu khớp với WineResponse (gồm các input + id + quality_score)
+    # BƯỚC 3: Trả về kết quả (Vẫn giữ logic cũ nhưng dùng payload.model_dump)
     return {
-        **payload.model_dump(), # Lấy toàn bộ input của người dùng
+        **payload.model_dump(), 
         "id": result["id"],
-        "quality_score": 7 if result["is_good_wine"] else 5, # Hoặc lấy result["quality_score"] nếu AI trả về điểm
+        "quality_score": result["quality_score"], # Dùng điểm thật từ AI trả về
         "created_at": result["created_at"]
     }
-
 # API LẤY LỊCH SỬ
 @router.get("/history", response_model=list[WineResponse])
 def get_user_history(
     db: Session = Depends(get_db), 
-    current_user: User = Depends(get_current_user)
+   
 ):
     
-    return predictService.get_history_by_user(db, current_user.id)
+    return predictService.get_history_by_user(db, user_id)

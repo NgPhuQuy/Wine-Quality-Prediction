@@ -1,15 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers.predict import predict, user
+from routers.predict import predict
 # 1. IMPORT CƠ SỞ DỮ LIỆU
 # Lấy engine và Base từ core để kết nối và tạo bảng
 from core.database import engine, Base
 # Phải import model user để SQLAlchemy nhận diện được cấu trúc bảng
-
+# from .routers.
 
 # 2. IMPORT ROUTERS & SERVICES
 from routers import auth
-from schemas.wine import WineInput 
+from schemas.wine import WineCreate
 from services.predictService import predict_wine
 from services.modelInfoService import get_model_metadata
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from core.database import get_db
-from schemas.user import UserCreate, UserResponse, UserLogin # Thêm UserLogin vào đây
-from services import authService
+from ..core.database import get_db
+from ..schemas.user import UserCreate, UserResponse, UserLogin # Thêm UserLogin vào đây
+from ..services import authService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -13,7 +13,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
-            detail="Username này đã có người sử dụng rồi Quý ơi!"
+            detail="Username này đã có người sử dụng"
         )
     
     # 2. Gọi service để tạo user mới (nhớ kiểm tra service đã nhận đủ 4 trường chưa nhé)
@@ -33,6 +33,7 @@ def login(user: UserLogin, db: Session = Depends(get_db)): # Dùng UserLogin ở
     # 4. Trả về thông báo thành công và thông tin cơ bản
     return {
         "message": "Đăng nhập thành công", 
+        "user_id": auth_user.id,
         "username": auth_user.username,
         
     }

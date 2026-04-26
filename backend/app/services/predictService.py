@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models.wine import WinePrediction
-from app.schemas.wine import WineCreate
+from ..models.wine import WinePrediction
+from ..schemas.wine import WineCreate
 from . import model, COLUMNS # Đảm bảo file __init__.py trong services đã load model
 import pandas as pd
 
@@ -62,7 +62,8 @@ def predict_and_store_wine(db: Session, data: WineCreate, user_id: int):
             ph=float(input_data.get("ph")),
             sulphates=float(input_data.get("sulphates")),
             alcohol=alc,
-            quality_score=prediction 
+            quality_score=prediction, 
+           
         )
         db.add(db_prediction)
         db.commit()
