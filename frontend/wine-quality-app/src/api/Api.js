@@ -1,26 +1,45 @@
 export const predictWine = async (formData) => {
   try {
-    const res = await fetch("http://127.0.0.1:8000/predict", {
+    // 1. Lấy user_id từ "túi" localStorage ra
+    const userId = localStorage.getItem("user_id");
+
+    // 2. Kiểm tra nếu chưa đăng nhập thì bắt đi đăng nhập ngay
+    if (!userId) {
+      alert("Lỗi!");
+      return null;
+    }
+
+    // 3. Gom 11 thông số từ Form + user_id vào một gói duy nhất
+    const dataToSend = {
+      ...formData,
+      user_id: parseInt(userId) // Ép kiểu về số (Integer) cho đúng yêu cầu của An/Đạt
+    };
+
+    // 4. Gửi lên Backend (Lưu ý dấu / ở cuối URL để tránh lỗi Redirect)
+    const res = await fetch("http://127.0.0.1:8000/predict/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(dataToSend),
     });
 
-    if (!res.ok) throw new Error("API error");
+    // 5. Nếu lỗi 422/500, lấy chi tiết lỗi để debug cho dễ
+    if (!res.ok) {
+      const errorDetail = await res.json();
+      console.error("Lỗi chi tiết từ Backend:", errorDetail);
+      throw new Error(errorDetail.detail || "API error");
+    }
 
     const data = await res.json();
     
-    // BE trả về "status": "success", ta nên kiểm tra nó
     if (data.status === "success") {
       return data; 
     }
     throw new Error("Invalid response");
   } catch (error) {
-    console.error(error);
+    console.error("Lỗi tại predictWine:", error);
     return null;
   }
 };
-
 
 export const getModelInfo = async () => {
   try {

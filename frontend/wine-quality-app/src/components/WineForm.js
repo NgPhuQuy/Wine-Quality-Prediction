@@ -10,7 +10,7 @@ const ranges = {
   free_sulfur_dioxide: [1, 300],
   total_sulfur_dioxide: [6, 450],
   density: [0.987, 1.005],
-  pH: [2.8, 4],
+  ph: [2.8, 4],
   sulphates: [0.2, 2],
   alcohol: [8, 15]
 };

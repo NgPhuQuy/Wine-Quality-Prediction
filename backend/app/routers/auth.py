@@ -37,3 +37,12 @@ def login(user: UserLogin, db: Session = Depends(get_db)): # Dùng UserLogin ở
         "username": auth_user.username,
         
     }
+
+@router.post("/logout")
+def logout():
+    # Vì mình dùng cơ chế Simple + ID (không lưu Session trên Server),
+    # nên Backend chỉ cần gửi thông báo xác nhận là xong.
+    return {
+        "status": "success",
+        "message": "Đăng xuất thành công. Hẹn gặp lại bạn!"
+    }

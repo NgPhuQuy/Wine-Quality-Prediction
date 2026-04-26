@@ -31,7 +31,7 @@ def predict_and_store_wine(db: Session, data: WineCreate, user_id: int):
             'free sulfur dioxide': float(input_data.get("free_sulfur_dioxide", 0)),
             'total sulfur dioxide': float(input_data.get("total_sulfur_dioxide", 0)),
             'density': dens,
-            'pH': float(input_data.get("ph", 0)), # Chú ý: ph (schema) -> pH (model)
+            'ph': float(input_data.get("ph", 0)), # Chú ý: ph (schema) -> pH (model)
             'sulphates': float(input_data.get("sulphates", 0)),
             'alcohol': alc,
             'type': int(input_data.get("wine_type", 0)), # wine_type (schema) -> type (model)
@@ -84,3 +84,10 @@ def predict_and_store_wine(db: Session, data: WineCreate, user_id: int):
             "status": "error",
             "message": f"Lỗi xử lý dự đoán: {str(e)}"
         }
+def get_history_by_user(db: Session, user_id: int):
+    try:
+        # Kiểm tra xem WinePrediction đã được import chưa nhé
+        return db.query(WinePrediction).filter(WinePrediction.user_id == user_id).all()
+    except Exception as e:
+        print(f"LỖI {str(e)}") # Dòng này sẽ in lỗi ra Terminal cho Quý thấy
+        return None

@@ -36,9 +36,9 @@ function AuthPage({ onLogin }) {
     
     if (data && data.message === "Đăng nhập thành công") {
       alert(data.username + "đăng nhập thành công!");
-      
-
-      localStorage.setItem("user_logged", data.username); 
+      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("username", data.username);
+      localStorage.removeItem("user_logged");
       
       onLogin(); // Cho vào trang Dashboard ngay và luôn
     } else {
