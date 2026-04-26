@@ -42,7 +42,7 @@ const handleSubmit = async (e) => {
 
     const payload = {
       ...form,
-      type: wineType === "red" ? 0 : 1
+      wine_type: wineType === "red" ? 0 : 1  // FIX: đổi "type" → "wine_type" để khớp với WineCreate schema
     };
 
     setChartData(payload);

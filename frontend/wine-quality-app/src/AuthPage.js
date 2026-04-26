@@ -35,11 +35,11 @@ function AuthPage({ onLogin }) {
 
     
     if (data && data.message === "Đăng nhập thành công") {
-      alert(data.username + "đăng nhập thành công!");
+      alert(data.username + " đăng nhập thành công!");  // FIX: thêm space trước "đăng nhập"
       localStorage.setItem("user_id", data.user_id);
       localStorage.setItem("username", data.username);
-      localStorage.removeItem("user_logged");
-      
+      // FIX: bỏ localStorage.removeItem("user_logged") - key này không dùng ở đâu, gây nhầm lẫn
+
       onLogin(); // Cho vào trang Dashboard ngay và luôn
     } else {
       alert("Sai tài khoản hoặc mật khẩu ");
