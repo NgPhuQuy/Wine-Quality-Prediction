@@ -31,6 +31,7 @@ def predict(
 # API LẤY LỊCH SỬ
 @router.get("/history", response_model=list[WineResponse])
 def get_user_history(
+    user_id: int,
     db: Session = Depends(get_db), 
    
 ):

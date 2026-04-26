@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routers.predict import predict
-from core.database import engine, Base
-from routers import auth
-from schemas.wine import WineCreate
-from services.predictService import predict_wine
-from services.modelInfoService import get_model_metadata
+from .core.database import engine, Base
+from .routers import auth , predict
+from .schemas.wine import WineCreate
+from .services.predictService import predict_and_store_wine
+from .services.modelInfoService import get_model_metadata
 
 Base.metadata.create_all(bind=engine)
 
