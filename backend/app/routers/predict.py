@@ -23,10 +23,11 @@ def predict_wine(  # FIX: đổi tên từ "predict" thành "predict_wine" để
     **payload.model_dump(),
     "id": result["id"],
     "quality_score": result["quality_score"],
+    "quality_label": result["quality_label"],
+    "raw_score": result["raw_score"],
+    "is_good_wine": result["is_good_wine"],
+    "status": "success",
     "created_at": result["created_at"],
-    "status": "success",           # thêm dòng này
-    "quality_label": result["quality_label"],  # thêm dòng này
-    "raw_score": result["raw_score"]
     }
 
 

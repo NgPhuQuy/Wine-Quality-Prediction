@@ -3,7 +3,7 @@ import React from "react";
 function ResultCard({ result }) {
   if (result === null || result === undefined) return null;
   
-  const isGood = result.is_good_wine;
+  const isGood = result.data?.is_good_wine;
   const confidence = result.data?.raw_score || 0;
   const percent = Math.round(confidence * 100);
 
