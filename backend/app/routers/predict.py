@@ -30,9 +30,10 @@ def predict_wine(  # FIX: đổi tên từ "predict" thành "predict_wine" để
     }
 
 
-@router.get("/history", response_model=list[WineResponse])
-def get_user_history(  # FIX: thêm thụt lề đúng (trước đây body nằm ngoài hàm)
-    user_id: int,
+@router.get("/history/{user_id}", response_model=list[WineResponse])
+def get_user_history(
+    user_id: int, 
     db: Session = Depends(get_db)
 ):
-    return predictService.get_history_by_user(db, user_id)
+    history = predictService.get_history_by_user(db, user_id)
+    return history
