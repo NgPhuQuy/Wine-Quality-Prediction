@@ -1,59 +1,44 @@
 import React from "react";
 
 function ResultCard({ result }) {
-  if (result === null || result === undefined) return null;
-  
-  const isGood = result.is_good_wine;
-  const confidence = result.data?.raw_score || 0;
-  const percent = Math.round(confidence * 100);
+  // Nếu không có result hoặc result.data thì không hiện
+  if (!result || !result.data) return null;
 
-  const color = isGood ? "#10b981" : "#64748b";
+  // Lấy dữ liệu từ bên trong object 'data' theo đúng log Console của bạn
+  const innerData = result.data;
   
+  // Lấy raw_score (xác suất) để tính %
+  const proba = parseFloat(innerData.raw_score || 0);
+  const percent = Math.round(proba * 100);
+
+  // Lấy quality_score (0 hoặc 1) để biết rượu tốt hay không
+  const isGood = innerData.quality_score === 1;
+  const color = isGood ? "#10b981" : "#94a3b8";
+
   return (
-    <div className="result-card luxury" style={{ textAlign: "center", padding: "20px" }}>
+    <div className="result-card luxury" style={{ textAlign: "center", padding: "20px", background: "white", borderRadius: "20px" }}>
+      <p style={{ color: "#94a3b8", fontSize: "11px", fontWeight: "bold", letterSpacing: "1px" }}>ANALYSIS RESULT</p>
       
-      <p style={{ color: "#94a3b8", fontSize: "12px", letterSpacing: "2px" }}>
-        ANALYSIS RESULT
-      </p>
-
-      {/*  Gauge */}
       <div style={{
-        width: "120px",
-        height: "120px",
-        margin: "20px auto",
-        borderRadius: "50%",
-        background: `conic-gradient(${color} ${percent}%, #e2e8f0 ${percent}%)`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
+        width: "120px", height: "120px", margin: "20px auto", borderRadius: "50%",
+        background: `conic-gradient(${color} ${percent}%, #f1f5f9 ${percent}%)`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        transition: "all 0.6s ease-in-out"
       }}>
-        <div style={{
-          width: "85%",
-          height: "85%",
-          background: "#fff",
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: "bold",
-          fontSize: "22px"
-        }}>
+        <div style={{ width: "85%", height: "85%", background: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", fontSize: "24px", color: "#1e293b" }}>
           {percent}%
         </div>
       </div>
 
-      {/*  Nhận xét */}
-      <h2 style={{ color: color }}>
-        {isGood ? "Good Wine " : "Normal Wine"}
+      <h2 style={{ color: color, marginBottom: "5px" }}>
+        {isGood ? "Good Quality Wine" : "Normal Quality Wine"}
       </h2>
-
-      {/*  Mô tả */}
-      <p style={{ fontSize: "14px", color: "#475569" }}>
-        {isGood
-          ? "High-quality wine with balanced composition and strong characteristics."
-          : "Wine is within acceptable quality range for normal consumption."}
+      
+      <p style={{ fontSize: "13px", color: "#64748b" }}>
+        {percent === 0 
+          ? "Backend returned 0. Please increase Alcohol/Sulphates." 
+          : `Model confidence: ${percent}%`}
       </p>
-
     </div>
   );
 }

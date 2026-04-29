@@ -35,32 +35,26 @@ function WineForm({ setResult, setLoading, setChartData }) {
       [key]: isNaN(num) ? 0 : Number(num.toFixed(3)),
     }));
   };
-
-const handleSubmit = async (e) => {
+ 
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const payload = {
-      ...form,
-      wine_type: wineType === "red" ? 0 : 1 
-    };
-
-    setChartData(payload);
+    const payload = { ...form, wine_type: wineType === "red" ? 0 : 1 };
 
     try {
       const response = await predictWine(payload);
-      console.log("=== RESPONSE ===", response)
-      
+      console.log("Dữ liệu gốc từ API:", response);
+
+      // Theo log của bạn: response có success: true và data: { ... }
       if (response && response.success === true) {
-        // const calculatedScore = (response.raw_score * 100).toFixed(2);
-        // setResult(calculatedScore);
-        setResult(response);
+        setResult(response, form); // Truyền nguyên object response đi
       } else {
-        alert("Model error: " + (response?.message || "Unknown error"));
+        alert("Lỗi: " + (response?.message || "Không có phản hồi từ Server"));
       }
-    } catch (error) {
-      console.error("Lỗi kết nối API:", error);
-      alert("Cannot connect to API server!");
+    } catch (err) {
+      console.error("Lỗi kết nối:", err);
+      alert("Kết nối Server thất bại!");
     } finally {
       setLoading(false);
     }
@@ -96,7 +90,7 @@ const handleSubmit = async (e) => {
 
       <form onSubmit={handleSubmit}>
         <div className="grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-          {Object.keys(form).map((key) => {
+          {Object.keys(ranges).map((key) => {
             const min = ranges[key][0];
             const max = ranges[key][1];
             const value = form[key];

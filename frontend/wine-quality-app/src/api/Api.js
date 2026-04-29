@@ -156,4 +156,31 @@ export const getModelInfo = async () => {
     // ✅ FIX : retourner un objet structuré plutôt que null
     return { success: false, message: error.message };
   }
+
+};
+
+// ─────────────────────────────────────────────
+//  Bổ sung: Lấy lịch sử dự đoán
+// ─────────────────────────────────────────────
+
+export const getPredictionHistory = async () => {
+  try {
+    const userId = getStoredUserId();
+    if (!userId) {
+      return { success: false, message: "Vui lòng đăng nhập để xem lịch sử." };
+    }
+
+    // Gửi yêu cầu lấy lịch sử dựa trên user_id
+    const res = await fetch(`${BASE_URL}/predict/history/${userId}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.detail || "Không thể lấy lịch sử dự đoán");
+    }
+
+    return { success: true, data: data.history || data };
+  } catch (error) {
+    console.error("Lỗi lấy lịch sử:", error);
+    return { success: false, message: error.message };
+  }
 };
