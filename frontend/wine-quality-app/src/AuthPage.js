@@ -14,7 +14,7 @@ function AuthPage({ onLogin }) {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(""); // xóa lỗi khi user gõ lại
+    setError(""); 
   };
 
   const handleSubmit = async () => {

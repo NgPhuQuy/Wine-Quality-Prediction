@@ -1,87 +1,39 @@
-import React, { useRef } from "react";
+import React from "react";
 import { Bar } from "react-chartjs-2";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
+  Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend
 } from "chart.js";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function WineChart({ data }) {
-  const chartRef = useRef();
-
   if (!data) return null;
 
-  const labels = Object.keys(data);
-  const values = Object.values(data);
+  // Trích xuất dữ liệu thực sự (nếu API bọc trong data.data)
+  const rawData = data.data ? data.data : data;
 
-  // 🎯 options
-  const options = {
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      x: {
-        ticks: { color: "#94a3b8", font: { size: 10 } },
-        grid: { display: false }
-      },
-      y: {
-        ticks: { color: "#94a3b8" },
-        grid: { color: "rgba(148,163,184,0.1)" }
-      }
-    }
-  };
+  // Danh sách loại trừ tất cả các trường không phải thông số hóa học
+  const exclude = ['id', 'status', 'quality_score', 'quality_label', 'created_at', 'user_id', 'input_data', 'message', 'success', 'data', 'type'];
+  
+  const labels = Object.keys(rawData).filter(key => !exclude.includes(key.toLowerCase()));
+  const values = labels.map(key => rawData[key]);
 
-  // 🎯 data chuẩn (KHÔNG phải function)
   const chartData = {
-    labels: labels,
-    datasets: [
-      {
-        label: "Wine Features",
-        data: values,
-        backgroundColor: (context) => {
-          const chart = context.chart;
-          const { ctx, chartArea } = chart;
-
-          if (!chartArea) return "#38bdf8"; // tránh crash lần đầu
-
-          const gradient = ctx.createLinearGradient(
-            0,
-            chartArea.top,
-            0,
-            chartArea.bottom
-          );
-          gradient.addColorStop(0, "#38bdf8");
-          gradient.addColorStop(1, "#6366f1");
-
-          return gradient;
-        },
-        borderRadius: 8
-      }
-    ]
+    labels: labels.map(l => l.replace(/_/g, ' ').toUpperCase()),
+    datasets: [{
+      label: "Chỉ số",
+      data: values,
+      backgroundColor: 'rgba(56, 178, 172, 0.8)',
+      borderRadius: 5,
+    }]
   };
 
   return (
-    <div className="chart-card" style={{ marginTop: "30px" }}>
-      <h3>Feature Visualization</h3>
-      <Bar
-        ref={chartRef}
-        data={chartData}
-        options={options}
-        height={140}
-    />
+    <div className="chart-wrapper">
+      <h3 style={{ fontSize: '15px', color: '#64748b', marginBottom: '15px' }}>📊 Biểu đồ thành phần hóa học</h3>
+      <div style={{ height: "280px" }}>
+        <Bar data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+      </div>
     </div>
   );
 }
