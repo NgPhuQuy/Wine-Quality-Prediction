@@ -4,7 +4,7 @@ import App from "./App";
 import AuthPage from "./AuthPage";
 
 function Root() {
-  const [isLogged, setIsLogged] = useState(false);
+  const [isLogged, setIsLogged] = useState(false); // ← luôn bắt đầu là false
 
   return isLogged ? (
     <App />

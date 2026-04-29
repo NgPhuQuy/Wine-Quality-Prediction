@@ -35,5 +35,6 @@ class WineResponse(WineBase):
     status: Optional[str] = None        # thêm
     quality_label: Optional[str] = None # thêm
     raw_score: Optional[float] = None 
+    is_good_wine: Optional[bool] = None
     class Config:
         from_attributes = True # Quan trọng: Để biến đổi từ SQLAlchemy sang Pydantic
