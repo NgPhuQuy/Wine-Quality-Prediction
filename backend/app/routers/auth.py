@@ -34,8 +34,7 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
             detail="Sai tài khoản hoặc mật khẩu, kiểm tra lại nhé"
         )
 
-    # FIX: message phải khớp với check ở frontend AuthPage.js
-    # Frontend check: data.message === "Đăng nhập thành công"
+
     return {
         "message": "Đăng nhập thành công",
         "user_id": auth_user.id,

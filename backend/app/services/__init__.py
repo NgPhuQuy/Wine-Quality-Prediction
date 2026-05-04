@@ -1,9 +1,7 @@
 import joblib
 from pathlib import Path
 
-# Xác định đường dẫn động từ vị trí file hiện tại
 current_path = Path(__file__).resolve()
-# services -> app -> backend -> Wine-Quality-Prediction (root)
 root_dir = current_path.parent.parent.parent.parent
 
 MODEL_FILE = root_dir / "models" / "final_model.joblib"
@@ -24,10 +22,9 @@ if METADATA_FILE.exists():
 else:
     print(f"Cảnh báo: Không tìm thấy metadata tại: {METADATA_FILE}")
 
-# FIX: Thêm dấu đóng ] bị thiếu ở cuối list COLUMNS
 COLUMNS = [
     'fixed acidity', 'volatile acidity', 'citric acid', 'residual sugar',
     'chlorides', 'free sulfur dioxide', 'total sulfur dioxide', 'density',
     'pH', 'sulphates', 'alcohol', 'type', 
     'total_acidity', 'sugar_alcohol_ratio', 'density_alcohol_interaction'
-]  # FIX: dấu ] bị thiếu trong file gốc
+] 

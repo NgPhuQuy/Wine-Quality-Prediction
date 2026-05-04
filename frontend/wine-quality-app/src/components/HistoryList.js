@@ -1,4 +1,5 @@
 import React from "react";
+import { getPredictionHistory } from "../api/Api";
 
 const HistoryList = ({ historyData }) => {
   if (!historyData || historyData.length === 0) return null;
@@ -37,7 +38,7 @@ const HistoryList = ({ historyData }) => {
                 <div className="accuracy-small">Reliability: {percent}%</div>
                 {/* Hiển thị con số 3.5 hoặc 8.2... */}
                 <h2 className="score-display">{score}</h2>
-                <p className="score-label">ĐIỂM HỆ 10</p>
+                <p className="score-label">Reliability</p>
               </div>
 
               <div className="card-metrics-grid">

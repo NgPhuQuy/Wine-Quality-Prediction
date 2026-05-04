@@ -28,10 +28,10 @@ def predict_and_store_wine(db: Session, data: WineCreate, user_id: int):
             'free sulfur dioxide': float(input_data.get("free_sulfur_dioxide", 0)),
             'total sulfur dioxide': float(input_data.get("total_sulfur_dioxide", 0)),
             'density': dens,
-            'pH': float(input_data.get("ph", 0)), # Chú ý: ph (schema) -> pH (model)
+            'pH': float(input_data.get("ph", 0)),
             'sulphates': float(input_data.get("sulphates", 0)),
             'alcohol': alc,
-            'type': int(input_data.get("wine_type", 0)), # wine_type (schema) -> type (model)
+            'type': int(input_data.get("wine_type", 0)),
             'total_acidity': total_acidity,
             'sugar_alcohol_ratio': sugar_alcohol_ratio,
             'density_alcohol_interaction': density_alcohol_interaction
@@ -55,7 +55,6 @@ def predict_and_store_wine(db: Session, data: WineCreate, user_id: int):
             sulphates=float(input_data.get("sulphates")),
             alcohol=alc,
             quality_score=prediction,
-            # FIX: thêm wine_type vào DB record (trước đây bị bỏ sót)
         )
         db.add(db_prediction)
         db.commit()
@@ -84,4 +83,4 @@ def get_history_by_user(db: Session, user_id: int):
         return db.query(WinePrediction).filter(WinePrediction.user_id == user_id).all()
     except Exception as e:
         print(f"Lỗi get_history: {str(e)}")
-        return []  # FIX: trả về [] thay vì None để tránh lỗi khi serialize list
+        return [] 
