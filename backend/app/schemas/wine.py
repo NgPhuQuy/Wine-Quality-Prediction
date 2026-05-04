@@ -18,7 +18,7 @@ class WineBase(BaseModel):
     free_sulfur_dioxide: float = Field(..., ge=0, json_schema_extra={"example": 11.0})
     total_sulfur_dioxide: float = Field(..., ge=0, json_schema_extra={"example": 34.0})
     density: float = Field(..., ge=0, json_schema_extra={"example": 0.9978})
-    ph: float = Field(..., ge=0, le=14, json_schema_extra={"example": 3.51}) # Đổi pH thành ph
+    ph: float = Field(..., ge=0, le=14, json_schema_extra={"example": 3.51}) 
     sulphates: float = Field(..., ge=0, json_schema_extra={"example": 0.56})
     alcohol: float = Field(..., ge=0, json_schema_extra={"example": 9.4})
     wine_type: WineType = Field(default=WineType.RED, description="0: Red, 1: White")
@@ -37,4 +37,4 @@ class WineResponse(WineBase):
     raw_score: Optional[float] = None 
     is_good_wine: Optional[bool] = None
     class Config:
-        from_attributes = True # Quan trọng: Để biến đổi từ SQLAlchemy sang Pydantic
+        from_attributes = True 

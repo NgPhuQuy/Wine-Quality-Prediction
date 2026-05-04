@@ -8,7 +8,6 @@ load_dotenv()
 
 URL = os.getenv("DB_URL")
 
-# FIX: Thêm kiểm tra URL trước khi tạo engine, tránh lỗi khó debug
 if not URL:
     raise ValueError(
         "Biến môi trường DB_URL chưa được cấu hình. "

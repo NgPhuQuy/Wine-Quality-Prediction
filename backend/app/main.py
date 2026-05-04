@@ -14,7 +14,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)  # FIX: thiếu dấu đóng ngoặc )
+)
 
 # Đăng ký router
 app.include_router(auth.router)

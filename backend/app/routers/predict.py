@@ -3,14 +3,13 @@ from sqlalchemy.orm import Session
 from ..schemas.wine import WineCreate, WineResponse
 from ..services import predictService
 from ..core.database import get_db
-# FIX: Bỏ "from ..routers import predict" - đây là self-import gây circular import
-# FIX: Bỏ "from ..models.user import User" - không dùng
+
 
 router = APIRouter(prefix="/predict", tags=["Prediction"])
 
 
 @router.post("/", response_model=WineResponse)
-def predict_wine(  # FIX: đổi tên từ "predict" thành "predict_wine" để không đụng tên với module
+def predict_wine( 
     payload: WineCreate,
     db: Session = Depends(get_db)
 ):
