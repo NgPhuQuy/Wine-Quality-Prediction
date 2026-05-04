@@ -21,7 +21,7 @@ function WineChart({ data }) {
   const chartData = {
     labels: labels.map(l => l.replace(/_/g, ' ').toUpperCase()),
     datasets: [{
-      label: "Chỉ số",
+      label: "index",
       data: values,
       backgroundColor: 'rgba(56, 178, 172, 0.8)',
       borderRadius: 5,
@@ -30,7 +30,7 @@ function WineChart({ data }) {
 
   return (
     <div className="chart-wrapper">
-      <h3 style={{ fontSize: '15px', color: '#64748b', marginBottom: '15px' }}>📊 Biểu đồ thành phần hóa học</h3>
+      <h3 style={{ fontSize: '15px', color: '#64748b', marginBottom: '15px' }}> Chemical composition symbol</h3>
       <div style={{ height: "280px" }}>
         <Bar data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
       </div>

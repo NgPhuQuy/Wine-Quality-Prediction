@@ -5,7 +5,7 @@ const HistoryList = ({ historyData }) => {
 
   return (
     <div className="elegant-history-wrapper" style={{ marginTop: '40px' }}>
-      <h2 style={{ marginBottom: '20px', fontSize: '18px', color: '#1e293b' }}>Lịch sử dự đoán</h2>
+      <h2 style={{ marginBottom: '20px', fontSize: '18px', color: '#1e293b' }}>Prediction history</h2>
       <div className="elegant-grid">
         {historyData.map((item, index) => {
           
@@ -29,12 +29,12 @@ const HistoryList = ({ historyData }) => {
           return (
             <div key={index} className="elegant-card">
               <div className="card-header">
-                <span className="batch-tag">MẪU #{historyData.length - index}</span>
+                <span className="batch-tag">Sample #{historyData.length - index}</span>
                 <div className={`status-pill ${status.toLowerCase()}`}>{status}</div>
               </div>
 
               <div className="card-main">
-                <div className="accuracy-small">TIN CẬY: {percent}%</div>
+                <div className="accuracy-small">Reliability: {percent}%</div>
                 {/* Hiển thị con số 3.5 hoặc 8.2... */}
                 <h2 className="score-display">{score}</h2>
                 <p className="score-label">ĐIỂM HỆ 10</p>
